@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <!-- Title Meta -->
+     <meta charset="utf-8" />
+     <title>Analytics | Rasket - Responsive Admin Dashboard Template</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description" content="A fully responsive premium admin dashboard template" />
+     <meta name="author" content="Techzaa" />
+     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+     @include('libraries.style')
+
+</head>
+
+<body>
+
+     <!-- START Wrapper -->
+     <div class="wrapper">
+
+          <!-- ========== Topbar Start ========== -->
+          @include('components.topbar')
+
+          <!-- Right Sidebar (Theme Settings) -->
+          @include('components.rightsidebar')
+
+          <!-- ========== Topbar End ========== -->
+
+          <!-- ========== App Menu Start ========== -->
+          @include('components.appmenu')
+
+          <!-- ========== App Menu End ========== -->
+
+          <!-- ==================================================== -->
+          <!-- Start right Content here -->
+          <!-- ==================================================== -->
+          @yield('content')
+          <!-- ==================================================== -->
+          <!-- End Page Content -->
+          <!-- ==================================================== -->
+
+     </div>
+     <!-- END Wrapper -->
+
+     @include('libraries.scripts')
+
+</body>
+
+</html>
