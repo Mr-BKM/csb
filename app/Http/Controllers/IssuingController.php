@@ -12,17 +12,22 @@ use Validator;
 class IssuingController extends Controller
 {
     protected $issuing;
+
     public function __construct()
     {
+        // Initialize the Issuing model
         $this->issuing = new Issuing();
     }
 
+    /**
+     * Display the current running issue data on the issuing page.
+     */
     public function showData(Request $request)
     {
-        // Get last running issue
+        // Retrieve the most recent issue that is currently in 'Running' state
         $lastAutoOrder = Issuing::where('issue_typ', 'Running')->orderBy('issue_id', 'desc')->first();
 
-        // If no running issue exists
+        // If no active running issue is found, return empty collections to the view
         if (!$lastAutoOrder) {
             return view('pages.issuing', [
                 'issuings' => collect(),
@@ -32,21 +37,34 @@ class IssuingController extends Controller
             ]);
         }
 
-        // Get items for that issue
-        $issuings = Issuing::with('item')->where('issue_id', $lastAutoOrder->issue_id)->get();
+        /**
+         * UPDATED: Get only items for that specific issue_id that are still marked as 'Running'.
+         */
+        $issuings = Issuing::with('item')
+            ->where('issue_id', $lastAutoOrder->issue_id)
+            ->where('issue_typ', 'Running') 
+            ->get();
 
-        // Extract customer info from the running issue
+        // Extract customer details (ID and Name) for the UI
         $currentCustomer = ['cus_id' => $lastAutoOrder->cus_id, 'cus_name' => $lastAutoOrder->cus_name];
 
+        // Fetch the initial issue date for this specific batch
         $currentIssueDate = Issuing::where('issue_id', $lastAutoOrder->issue_id)->orderBy('id', 'asc')->value('issue_date');
 
-        // $currentIssueDate = Issuing::where('issue_id', $request->order_id)->orderBy('id', 'asc')->value('issue_date');
-
-        return view('pages.issuing', ['issuings' => $issuings, 'issueId' => $lastAutoOrder->issue_id, 'currentCustomer' => $currentCustomer, 'currentIssueDate' => $currentIssueDate]);
+        return view('pages.issuing', [
+            'issuings' => $issuings, 
+            'issueId' => $lastAutoOrder->issue_id, 
+            'currentCustomer' => $currentCustomer, 
+            'currentIssueDate' => $currentIssueDate
+        ]);
     }
 
+    /**
+     * Temporarily save an item to the issue list and update inventory levels.
+     */
     public function tempsaveData(Request $request)
     {
+        // Validation rules for the incoming request
         $rules = [
             'issue_id' => 'required|string|max:20',
             'issue_typ' => 'required|string|max:255',
@@ -58,30 +76,11 @@ class IssuingController extends Controller
             'issue_date' => 'required|string|max:255',
         ];
 
+        // Custom error messages for validation
         $messages = [
             'issue_id.required' => 'Issue Number is required.',
-            'issue_id.string' => 'Issue Number must be a string.',
-            'issue_id.max' => 'Issue Number must not exceed 20 characters.',
-
-            'issue_typ.required' => 'Issue Type is required.',
-            'issue_typ.string' => 'Issue Type must be a string.',
-            'issue_typ.max' => 'Issue Type must not exceed 225 characters.',
-
-            'cus_name.required' => 'Customer Name is required.',
-            'cus_name.string' => 'Customer Name must be a string.',
-            'cus_name.max' => 'Customer Name must not exceed 255 characters.',
-
-            'cus_id.required' => 'Customer ID is required.',
-            'cus_id.string' => 'Customer ID must be a string.',
-            'cus_id.max' => 'Customer ID must not exceed 255 characters.',
-
             'itm_code.required' => 'Item Code is required.',
-            'itm_code.string' => 'Item Code  must be a string.',
-            'itm_code.max' => 'Item Code must not exceed 15 characters.',
-
             'itm_qty.required' => 'Item QTY is required.',
-            'itm_qty.string' => 'Item QTY must be a string.',
-            'itm_qty.max' => 'Item QTY must not exceed 255 characters.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -90,24 +89,23 @@ class IssuingController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        // Use a Database Transaction to ensure data integrity during stock updates
         DB::transaction(function () use ($request) {
-            // 🔎 Find item by itm_code (and lock it for update)
+            // Find the item by its code and lock the row to prevent concurrent update issues
             $item = Item::where('itm_code', $request->itm_code)->lockForUpdate()->first();
 
             if ($item) {
-                // 1. Book Stock එකෙන් Issue කරන ප්‍රමාණය අඩු කරනවා
-                // itm_book_stock = itm_book_stock - itm_qty
+                // 1. Deduct the issued quantity from the 'Book Stock'
                 $item->itm_book_stock = $item->itm_book_stock - $request->itm_qty;
 
-                // 2. Physical Stock (itm_stock) එක calculate කරනවා
-                // itm_stock = itm_book_stock - itm_loan_stock
-                // මෙතනදී උඩ line එකේ update වුණ අලුත් book_stock එක තමයි පාවිච්චි වෙන්නේ
+                // 2. Re-calculate 'Physical Stock'
+                // Physical Stock = Updated Book Stock - Loan Stock
                 $item->itm_stock = $item->itm_book_stock - ($item->itm_loan_stock ?? 0);
 
-                // 💾 Item table එක save කරනවා
+                // Save updated inventory values
                 $item->save();
 
-                // ➕ Save issuing record
+                // Create the record in the Issuing table
                 $this->issuing->create([
                     'issue_id' => $request->issue_id,
                     'issue_typ' => $request->issue_typ,
@@ -124,37 +122,34 @@ class IssuingController extends Controller
         return redirect()->back()->with('success', 'Item issued successfully and stock updated');
     }
 
+    /**
+     * Finalize the order by changing the status from 'Running' to 'Issued'.
+     */
     public function finishOrder(Request $request)
     {
-        $request->validate([
-            'order_id' => 'required|string',
-        ]);
+        $request->validate(['order_id' => 'required|string']);
 
         $orderId = $request->order_id;
 
         DB::transaction(function () use ($orderId) {
-            // 1. Update Issuing table
-            Issuing::where('issue_id', $orderId)->update([
-                'issue_typ' => 'Issued',
-            ]);
+            // 1. Mark all items in this issue as officially 'Issued'
+            Issuing::where('issue_id', $orderId)->update(['issue_typ' => 'Issued']);
 
-            // 2. Update Issuingloan table (Loan ekak widiyata kalin record wela thibuna nam)
-            // Meken loan table eketh status eka update wenawa
-            Issuingloan::where('issue_id', $orderId)->update([
-                'issue_typ' => 'Issued',
-            ]);
+            // 2. Also update related loan records if they exist
+            Issuingloan::where('issue_id', $orderId)->update(['issue_typ' => 'Issued']);
         });
 
         return redirect()->route('issuing.showData')->with('success', 'Order status updated to Issued successfully.');
     }
 
+    /**
+     * Mark an entire running order as a 'Loan'.
+     */
     public function markLoan(Request $request)
     {
-        $request->validate([
-            'order_id' => 'required|string',
-        ]);
+        $request->validate(['order_id' => 'required|string']);
 
-        // 1. Get the items first
+        // Fetch all items currently under this Order ID
         $items = Issuing::where('issue_id', $request->order_id)->get();
 
         if ($items->isEmpty()) {
@@ -162,16 +157,16 @@ class IssuingController extends Controller
         }
 
         DB::transaction(function () use ($items, $request) {
-            // 2. Update the original table
+            // 1. Update the original Issuing table records to 'Loan' status
             Issuing::where('issue_id', $request->order_id)->update([
                 'issue_id' => 'Loan',
                 'issue_typ' => 'Loan',
             ]);
 
-            // 3. Loop and insert into the issuingloan table
+            // 2. Duplicate these records into the Issuingloan table for tracking
             foreach ($items as $item) {
                 Issuingloan::create([
-                    'issue_table_id' => $item->id, // Issuing table eke ID eka methanata yanawa
+                    'issue_table_id' => $item->id, // Reference to the original Issuing ID
                     'issue_id' => 'Loan',
                     'cus_id' => $item->cus_id,
                     'itm_code' => $item->itm_code,
@@ -186,35 +181,36 @@ class IssuingController extends Controller
         return redirect()->route('issuing.showData')->with('success', 'Order marked as Loan and recorded successfully.');
     }
 
+    /**
+     * Delete an issued item and restore the stock quantities.
+     */
     public function deleteData($id)
     {
         DB::transaction(function () use ($id) {
-            // 🔎 Find issuing record
+            // Find the specific issue record and lock for deletion
             $issuing = Issuing::lockForUpdate()->find($id);
 
             if (!$issuing) {
                 throw new \Exception('Order Item not found.');
             }
 
-            // 🔎 Find related item
+            // Find the item associated with this record to restore stock
             $item = Item::where('itm_code', $issuing->itm_code)->lockForUpdate()->first();
 
             if (!$item) {
                 throw new \Exception('Item not found.');
             }
 
-            // 1. ➕ ADD BACK issued quantity to BOOK STOCK
-            // Issue එක delete කරන නිසා book stock එක වැඩි වෙනවා
+            // 1. Add the issued quantity back to the Book Stock
             $item->itm_book_stock = $item->itm_book_stock + $issuing->itm_qty;
 
-            // 2. 🔄 RE-CALCULATE Physical Stock
-            // itm_stock = (අලුත් book_stock) - itm_loan_stock
+            // 2. Re-calculate the Physical Stock based on the restored Book Stock
             $item->itm_stock = $item->itm_book_stock - ($item->itm_loan_stock ?? 0);
 
-            // 💾 Save the updated item
+            // Save inventory changes
             $item->save();
 
-            // ❌ Delete issuing record
+            // Permanently remove the issuing record
             $issuing->delete();
         });
 

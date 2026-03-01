@@ -17,7 +17,7 @@ class IssuingLoanController extends Controller
         return view('pages.issuingloan', compact('issuings'));
     }
 
-    public function finish(Request $request)
+    public function finish(Request $request) 
     {
         $data = $request->validate([
             'ids' => 'required|array',

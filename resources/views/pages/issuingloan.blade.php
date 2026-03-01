@@ -44,7 +44,7 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-3">Order Confirm</h5>
+                                <h5 class="card-title mb-3">Loan Items</h5>
 
                                 {{-- Grid.js Table --}}
                                 <div id="table-gridjs"></div>
@@ -308,7 +308,7 @@
     @foreach ($issuings as $issuing)
         <!-- ✅ Update Modal -->
         <div class="modal fade" id="UpdateModalCenter{{ $issuing->id }}" tabindex="-1"
-            aria-labelledby="UpdateModalLabel{{ $issuing->id }}" aria-hidden="true">
+            aria-labelledby="UpdateModalLabel{{ $issuing->id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <form method="POST" action="{{ route('issuingLoan.update') }}">

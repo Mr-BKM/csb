@@ -136,7 +136,7 @@
                                                         <div class="modal fade" id="UpdateModalCenter{{ $ordera->id }}"
                                                             tabindex="-1"
                                                             aria-labelledby="UpdateModalLabel{{ $ordera->id }}"
-                                                            aria-hidden="true">
+                                                            aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                                                             <div class="modal-dialog modal-lg modal-dialog-centered">
                                                                 <div class="modal-content">
                                                                     <form method="POST"
@@ -145,7 +145,7 @@
                                                                         <div class="modal-header">
                                                                             <h5 class="modal-title"
                                                                                 id="UpdateModalLabel{{ $ordera->id }}">
-                                                                                Update Order Item
+                                                                                Edit Order Item
                                                                             </h5>
                                                                             <button type="button" class="btn-close"
                                                                                 data-bs-dismiss="modal"

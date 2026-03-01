@@ -677,8 +677,9 @@
                           </a>
                       </li> <!-- end Demo Menu Item --> --}}
 
+                      @if (auth()->user()->role === 'Admin')
                       <li class="menu-title">Import/Export</li>
-
+                     
                       <li class="nav-item">
                           <a class="nav-link" href="/allmigration">
                               <span class="nav-icon">
@@ -687,6 +688,7 @@
                               <span class="nav-text"> Migration </span>
                           </a>
                       </li>
+                      @endif
 
                   </ul>
               </div>

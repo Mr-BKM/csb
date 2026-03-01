@@ -70,106 +70,84 @@
     {{-- Grid.js and Action Logic --}}
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // NOTE: addedItems array is kept for the 'Finish' button, but it won't be populated
-            // by the new Update/Cancel buttons (which are for row actions, not bulk selection).
-            let addedItems = [];
+    // Initialize the data array by looping through the PHP orderms collection
+    const data = [
+        @foreach ($orderms as $index => $orderm)
+            [
+                "{{ $loop->iteration }}",
+                "{{ $orderm->order_date }}",
+                "{{ $orderm->order_id }}",
+                "{{ $orderm->cus_name }}",
+                "{{ $orderm->itm_code }}",
+                gridjs.html(`{!! $orderm->item->itm_name ?? '-' !!}`), // Render item name or dash if null
+                "{{ $orderm->itm_qty }}",
+                gridjs.html(
+                    `<div style="display: inline-flex; align-items: center; gap: 6px;">
+                        <button class="btn btn-sm btn-danger cancel-btn" data-id="{{ $orderm->id }}" title="Cancel">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>`
+                )
+            ]
+            @if (!$loop->last) , @endif
+        @endforeach
+    ];
 
-            const data = [
-                @foreach ($orderms as $index => $orderm)
-                    [
-                        "{{ $loop->iteration }}",
-                        "{{ $orderm->order_date }}",
-                        "{{ $orderm->order_id }}",
-                        "{{ $orderm->cus_name }}",
-                        "{{ $orderm->itm_code }}",
-                        gridjs.html(`{!! $orderm->item->itm_name ?? '-' !!}`),
-                        "{{ $orderm->itm_qty }}",
-                        gridjs.html(
-                            `<div style="display: inline-flex; align-items: center; gap: 6px;">
-                                <button class="btn btn-sm btn-danger cancel-btn" data-id="{{ $orderm->id }}" title="Cancel">
-                                    <i class="fas fa-xmark"></i>
-                                    </button>
-                                    </div>`
-                        )
-                    ]
-                    @if (!$loop->last)
-                        ,
-                    @endif
-                @endforeach
-            ];
+    // Configure the Grid.js instance
+    const grid = new gridjs.Grid({
+        columns: [
+            { name: "No", width: "60px", sort: false },
+            "Order Date", 
+            "Order ID", 
+            "Customer Name", 
+            "Item Code", 
+            "Item Name", 
+            "Item QTY",
+            { name: "Cancel", sort: false, width: "50px" },
+        ],
+        data,
+        search: true,
+        sort: true,
+        pagination: { enabled: true, limit: 10 },
+        className: {
+            table: 'table table-bordered table-hover mb-0',
+            th: 'bg-light text-center',
+            td: 'text-center align-middle'
+        },
+        language: {
+            search: { placeholder: '     Search Orders...' }
+        },
+        html: true
+    });
 
-            const grid = new gridjs.Grid({
-                columns: [{
-                        name: "No",
-                        width: "60px",
-                        sort: false
-                    },
-                    "Order Date",
-                    "Order ID",
-                    "Customer Name",
-                    "Item Code",
-                    "Item Name",
-                    "Item QTY",
-                    {
-                        name: "Cancel",
-                        sort: false,
-                        width: "50px"
-                    },
-                ],
-                data,
-                search: true,
-                sort: true,
-                pagination: {
-                    enabled: true,
-                    limit: 10
-                },
-                className: {
-                    table: 'table table-bordered table-hover mb-0',
-                    th: 'bg-light text-center',
-                    td: 'text-center align-middle'
-                },
-                language: {
-                    search: {
-                        placeholder: '     Search Orders...'
-                    }
-                },
-                html: true
-            });
+    // Render the grid into the specific HTML container
+    grid.render(document.getElementById("table-gridjs"));
 
-            grid.render(document.getElementById("table-gridjs"));
-
-            // Toast function
-            function showToast(message, type = 'primary') {
-                const toastEl = document.getElementById('actionToast');
-                const toastMsg = document.getElementById('toastMessage');
-                toastEl.className = `toast align-items-center text-bg-${type} border-0`;
-                toastMsg.textContent = message;
-                if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-                    new bootstrap.Toast(toastEl).show();
-                }
+    /**
+     * FIX: EVENT DELEGATION
+     * Instead of attaching listeners to individual buttons (which disappear when changing pages),
+     * we attach one listener to the parent container. This ensures that buttons on Page 2, 3, etc.,
+     * remain functional after the grid re-renders.
+     */
+    document.getElementById("table-gridjs").addEventListener("click", function(e) {
+        // Check if the clicked element is the cancel button or inside it
+        const btn = e.target.closest(".cancel-btn");
+        
+        if (btn) {
+            e.preventDefault();
+            // Extract the unique ID from the data-id attribute
+            const id = btn.dataset.id;
+            // Locate the corresponding Bootstrap modal by ID
+            const modalEl = document.getElementById(`deleteModal${id}`);
+            
+            if (modalEl) {
+                // Initialize and display the Bootstrap modal
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
             }
-
-            // Function to attach listeners to the new action icons
-            function attachActionIconListeners() {
-
-                // Attach listener for the Cancel Icon
-                document.querySelectorAll(".cancel-btn").forEach(btn => {
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        const id = btn.dataset.id;
-                        // Placeholder: Implement actual cancellation logic (e.g., AJAX POST) here
-                        const modalEl = document.getElementById(`deleteModal${id}`);
-                        const modal = new bootstrap.Modal(modalEl);
-                        modal.show();
-                    };
-                });
-            }
-
-            // Attach listeners after the grid is rendered or updated
-            grid.on('ready', attachActionIconListeners);
-            grid.on('updated', attachActionIconListeners);
-
-        });
+        }
+    });
+});
     </script>
     @foreach ($orderms as $orderm)
         <!-- Modal Delete-->

@@ -229,13 +229,13 @@
     @foreach ($orderms as $orderm)
         <!-- ✅ Update Modal -->
         <div class="modal fade" id="UpdateModalCenter{{ $orderm->id }}" tabindex="-1"
-            aria-labelledby="UpdateModalLabel{{ $orderm->id }}" aria-hidden="true">
+            aria-labelledby="UpdateModalLabel{{ $orderm->id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">>
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <form method="POST" action="{{ route('modifyorder.updateData', $orderm->id) }}">
                         @csrf
                         <div class="modal-header">
-                            <h5 class="modal-title">Update Order PO</h5>
+                            <h5 class="modal-title">Edit Order PO</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
 

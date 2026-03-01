@@ -1,80 +1,48 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Orderreceived;
 
+use App\Models\Orderreceived;
 use Illuminate\Http\Request;
 
 class ItemaddbillController extends Controller
 {
+    /**
+     * Fetch and display orders that are ready to be billed.
+     */
     public function showData()
     {
-        $orderreceiveds = Orderreceived::where('itm_rec_state', 'Added')->where('bill_state', 'Pending')->orderBy('order_id', 'asc')->get();
+        // Retrieve records where item state is 'Added' and bill state is 'Pending'
+        // Ordered by 'order_id' in ascending order.
+        $orderreceiveds = Orderreceived::where('itm_rec_state', 'Added')
+                                        ->where('bill_state', 'Pending')
+                                        ->orderBy('order_id', 'asc')
+                                        ->get();
+
+        // Return the view and pass the retrieved data using compact.
         return view('pages.itemaddbill', compact('orderreceiveds'));
     }
 
+    /**
+     * Update the billing information for the selected orders.
+     */
     public function finish(Request $request)
     {
+        // Validate the incoming request data to ensure all fields are present and correct.
         $data = $request->validate([
-            'ids' => 'required|array',
+            'ids' => 'required|array',          // Expects an array of record IDs.
             'bill_submit_date' => 'required|date',
             'bill_number' => 'required|string',
         ]);
 
+        // Bulk update the records matching the provided IDs.
         Orderreceived::whereIn('id', $data['ids'])->update([
             'bill_submit_date' => $data['bill_submit_date'],
             'bill_number' => $data['bill_number'],
-            'bill_state' => 'Added',
+            'bill_state' => 'Added', // Change billing state to 'Added' after processing.
         ]);
 
-        // Get related item codes from the order table
-        // $itemCodes = orderreceived::whereIn('id', $data['ids'])->pluck('itm_code');
-
-        // Update items status
-        // Item::whereIn('itm_code', $itemCodes)->update(['itm_status' => 'active']);
-
-        // return response()->json(['success' => true]);
+        // Redirect back to the data list with a success notification.
         return redirect()->route('itemaddbill.showData')->with('success', 'Selected Order items "Confirmed" successfully!');
     }
 }
-
-// <?php
-
-// namespace App\Http\Controllers;
-// use App\Models\orderreceived;
-
-// use Illuminate\Http\Request;
-
-// class ItemreceivededitController extends Controller
-// {
-    // public function showData()
-    // {
-    //     $orderreceiveds = orderreceived::where('itm_rec_state', 'Item Received')->orderBy('order_id', 'asc')->get();
-    //     return view('pages.itemreceivededit', compact('orderreceiveds'));
-    // }
-
-    //     public function finish(Request $request)
-    // {
-    //     $data = $request->validate([
-    //         'ids' => 'required|array',
-    //         'itm_inv_date' => 'required|date',
-    //         'itm_inv_numer' => 'required|string',
-    //     ]);
-
-    //     orderreceived::whereIn('id', $data['ids'])->update([
-    //         'itm_inv_date' => $data['itm_inv_date'],
-    //         'itm_inv_numer' => $data['itm_inv_numer'],
-    //         'itm_rec_state' => 'Added',
-    //     ]);
-
-    //     // Get related item codes from the order table
-    //     // $itemCodes = orderreceived::whereIn('id', $data['ids'])->pluck('itm_code');
-
-    //     // Update items status
-    //     // Item::whereIn('itm_code', $itemCodes)->update(['itm_status' => 'active']);
-
-    //     // return response()->json(['success' => true]);
-    //     return redirect()->route('itemreceivededit.showData')->with('success', 'Selected Order items "Confirmed" successfully!');
-    // }
-// }
-

@@ -192,48 +192,12 @@
             grid.on('ready', attachActionIconListeners);
             grid.on('updated', attachActionIconListeners);
 
-
-            // Finish button logic (dependent on 'addedItems')
-            //         document.getElementById("finishBtn")?.addEventListener("click", () => {
-            //             const po_date = document.getElementById("date-picker").value;
-            //             const po_number = document.getElementById("po_number").value;
-            //             const sup_id = document.getElementById("sup_id").value;
-            //             const sup_name = document.getElementById("sup_name").value;
-
-            //             if (addedItems.length === 0) {
-            //                 showToast("No items selected! Please select items for the PO.", 'danger');
-            //                 return;
-            //             }
-
-            //             if (!po_date || !po_number || !sup_id || !sup_name) {
-            //                 showToast("Please fill in all PO details!", 'warning');
-            //                 return;
-            //             }
-
-            //             // Create a hidden form for submission
-            //             const form = document.createElement('form');
-            //             form.method = 'POST';
-            //             form.action = "{{ route('confirmorder.finish') }}";
-
-            //             form.innerHTML = `
-        //     @csrf
-        //     <input type="hidden" name="po_date" value="${po_date}">
-        //     <input type="hidden" name="po_number" value="${po_number}">
-        //     <input type="hidden" name="sup_id" value="${sup_id}">
-        //     <input type="hidden" name="sup_name" value="${sup_name}">
-        //     ${addedItems.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
-        // `;
-
-            //             document.body.appendChild(form);
-            //             form.submit();
-            //         });
-
         });
     </script>
     @foreach ($orderms as $orderm)
         <!-- ✅ Update Modal -->
         <div class="modal fade" id="UpdateModalCenter{{ $orderm->id }}" tabindex="-1"
-            aria-labelledby="UpdateModalLabel{{ $orderm->id }}" aria-hidden="true">
+            aria-labelledby="UpdateModalLabel{{ $orderm->id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">>
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <form method="POST" action="{{ route('itemreceived.update') }}">
@@ -330,7 +294,7 @@
 
         <!-- ✅ Cancel Modal -->
         <div class="modal fade" id="deleteModal{{ $orderm->id }}" tabindex="-1"
-            aria-labelledby="UpdateModalLabel{{ $orderm->id }}" aria-hidden="true">
+            aria-labelledby="UpdateModalLabel{{ $orderm->id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">>
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <form method="POST" action="{{ route('itemreceived.cancelorder') }}">

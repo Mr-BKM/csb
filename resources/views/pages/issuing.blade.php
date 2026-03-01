@@ -47,7 +47,7 @@
                             <div class="col-sm-7">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="card-title mb-1 anchor" id="basic"> Item Manual Order Form </h5>
+                                        <h5 class="card-title mb-1 anchor" id="basic"> Item Issuing </h5>
                                         <br>
                                         <div class="d-flex align-items-center gap-2 flex-wrap">
                                             <div style="width: 180px;">

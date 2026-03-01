@@ -269,7 +269,7 @@
                                                             <!-- Modal Update -->
                                                             <div class="modal fade"
                                                                 id="UpdateModalCenter{{ $orderm->id }}" tabindex="-1"
-                                                                aria-labelledby="SaveModalCenterTitle" aria-hidden="true">
+                                                                aria-labelledby="SaveModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                                                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                                                     <div class="modal-content">
                                                                         <form method="POST"
@@ -277,7 +277,7 @@
                                                                             @csrf <div class="modal-header">
                                                                                 <h5 class="modal-title"
                                                                                     id="SaveModalCenterTitle">
-                                                                                    Order Item Update</h5>
+                                                                                    Edit Order Item</h5>
                                                                                 <button type="button" class="btn-close"
                                                                                     data-bs-dismiss="modal"
                                                                                     aria-label="Close"></button>
