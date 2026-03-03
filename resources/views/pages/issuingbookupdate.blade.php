@@ -124,7 +124,9 @@
                         "{{ $issuing->item->itm_page_num }}",
                         "{{ $issuing->itm_code }}",
                         gridjs.html(`{!! $issuing->item->itm_name ?? '-' !!}`),
+                        "{{ $issuing->itm_stockinhand }}",
                         "{{ $issuing->itm_qty }}",
+                        "{{ number_format($issuing->itm_stockinhand - $issuing->itm_qty, 2) }}",
                         gridjs.html(
                             `<button class="btn btn-sm btn-success add-btn" data-id="{{ $issuing->id }}" data-item-name="{{ $issuing->item->itm_page_num ?? 'Item' }}">Add</button>`
                         ),
@@ -146,7 +148,9 @@
                     "Page No",
                     "Item Code",
                     "Item Name",
+                    "Last QTY",
                     "Item QTY",
+                    "New QTY",
                     {
                         name: "Add to Update List",
                         sort: false,
