@@ -69,6 +69,15 @@
 }
         // --- 1. Save Modal (Initialized on document ready) ---
         $(function() {
+
+        $(document).on('select2:open', function(e) {
+            window.setTimeout(function () {
+                const searchField = document.querySelector('.select2-search__field');
+                if (searchField) {
+                    searchField.focus();
+                }
+            }, 10); // Miliseconds 10 k delay ekak dunnama browser eken focus eka block karanne na
+        });
             // Customer
             $('#customer_slt').select2({
                 theme: "bootstrap-5",

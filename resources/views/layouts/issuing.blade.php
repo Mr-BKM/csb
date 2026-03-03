@@ -69,6 +69,13 @@
 }
         // --- 1. Save Modal (Initialized on document ready) ---
         $(function() {
+
+        $(document).on('select2:open', () => {
+        const searchField = document.querySelector('.select2-search__field');
+        if (searchField) {
+            searchField.focus();
+        }
+    });
             // Customer
             $('#customer_slt').select2({
                 theme: "bootstrap-5",
