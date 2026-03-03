@@ -19,8 +19,8 @@ return new class extends Migration
         $table->string('itm_code')->nullable();
         $table->string('itm_name')->nullable();
         $table->string('itm_unit_of_measure')->nullable();
-        $table->string('itm_qty')->nullable();
-        $table->string('itm_stockinhand')->nullable();
+        $table->decimal('itm_qty', 15, 2)->nullable()->default(0);
+        $table->decimal('itm_stockinhand', 15, 2)->nullable()->default(0);
         $table->date('order_date')->nullable();
         $table->string('order_typ')->nullable();
         $table->timestamps();

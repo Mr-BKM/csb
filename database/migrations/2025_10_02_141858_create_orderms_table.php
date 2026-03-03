@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('cus_name');
             $table->string('cus_id');
             $table->string('itm_code');
-            $table->string('itm_qty');
+            $table->decimal('itm_qty', 15, 2)->default(0);
             $table->string('order_typ');
             $table->date('order_date');
             $table->string('po_date')->nullable();
@@ -27,11 +27,11 @@ return new class extends Migration
             $table->string('po_state')->default('Pending');
             $table->date('itm_rec_date')->nullable();
             $table->string('itm_inv_numer')->nullable();
-            $table->string('itm_res_qty')->nullable();
+            $table->decimal('itm_res_qty', 15, 2)->nullable()->default(0);
             $table->string('itm_warranty')->nullable();
-            $table->float('itm_unit_price')->nullable();
-            $table->float('itm_tot_price')->nullable();
-            $table->float('inv_tot_price')->nullable();
+            $table->decimal('itm_unit_price', 15, 2)->nullable()->default(0);
+            $table->decimal('itm_tot_price', 15, 2)->nullable()->default(0);
+            $table->decimal('inv_tot_price', 15, 2)->nullable()->default(0);
             $table->string('itm_rec_state')->default('Pending');
             $table->string('bill_submit_date')->nullable();
             $table->string('bill_number')->nullable();

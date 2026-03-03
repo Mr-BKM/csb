@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('cus_name');
             $table->string('cus_id');
             $table->string('itm_code');
-            $table->string('itm_stockinhand');
-            $table->string('itm_qty');
+            $table->decimal('itm_stockinhand', 10, 2);
+            $table->decimal('itm_qty', 10, 2);
             $table->date('issue_date');
             $table->timestamps();
             $table->foreign('itm_code')->references('itm_code')->on('items');

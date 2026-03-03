@@ -24,10 +24,10 @@ return new class extends Migration
             $table->string('itm_subgroup_id')->nullable();
             $table->string('itm_subgroup')->nullable();
             $table->string('itm_unit_of_measure');
-            $table->unsignedInteger('itm_book_stock')->default(0);
-            $table->unsignedInteger('itm_loan_stock')->default(0);
-            $table->unsignedInteger('itm_stock')->default(0);
-            $table->unsignedInteger('itm_reorder_level')->default(0);
+            $table->decimal('itm_book_stock', 10, 2)->default(0);
+            $table->decimal('itm_loan_stock', 10, 2)->default(0);
+            $table->decimal('itm_stock', 10, 2)->default(0);
+            $table->decimal('itm_reorder_level', 10, 2)->default(0);
             $table->string('itm_reorder_flag');
             $table->text('itm_description')->nullable();
             $table->string('itm_status')->default('active');

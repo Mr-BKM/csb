@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string ('issue_id');
             $table->string('cus_id');
             $table->string('itm_code');
-            $table->string('itm_stockinhand');
-            $table->string('itm_qty');
+            $table->decimal('itm_stockinhand', 10, 2); 
+            $table->decimal('itm_qty', 10, 2);
             $table->date('issue_date');
             $table->string('issue_typ');
             $table->timestamps();

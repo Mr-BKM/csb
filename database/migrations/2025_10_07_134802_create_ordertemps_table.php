@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('cus_name');
             $table->string('cus_id');
             $table->string('itm_code');
-            $table->string('itm_qty');
+            $table->decimal('itm_qty', 15, 2)->default(0);
             $table->string('order_typ');
             $table->date('order_date');
             $table->timestamps();

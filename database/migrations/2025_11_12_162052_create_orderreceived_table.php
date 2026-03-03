@@ -17,13 +17,13 @@ return new class extends Migration
             $table->string ('order_id');
             $table->string('cus_id');
             $table->string('itm_code');
-            $table->string('itm_qty');
+            $table->decimal('itm_qty', 15, 2)->default(0);
             $table->string('sup_id');
             $table->date('itm_rec_date')->nullable();
-            $table->string('itm_res_qty')->nullable();
+            $table->decimal('itm_res_qty', 15, 2)->nullable()->default(0);
             $table->string('itm_warranty')->nullable();
-            $table->float('itm_unit_price')->nullable();
-            $table->float('itm_tot_price')->nullable();
+            $table->decimal('itm_unit_price', 15, 2)->nullable()->default(0);
+            $table->decimal('itm_tot_price', 15, 2)->nullable()->default(0);
             $table->string('itm_rec_state')->nullable();
             $table->date('itm_inv_date')->nullable();
             $table->string('itm_inv_numer')->nullable();
