@@ -561,16 +561,37 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. Sync Logic (Meka success unath naththum weda karanna ona) ---
         const select = document.getElementById('issue_typ_1');
         const hidden = document.getElementById('issue_typ_1_hidden');
 
-        // Sync on change
-        select.addEventListener('change', function() {
-            hidden.value = this.value;
-        });
+        if (select && hidden) {
+            select.addEventListener('change', function() {
+                hidden.value = this.value;
+            });
+            hidden.value = select.value;
+        }
 
-        // Sync on load (important when editing / old data)
-        hidden.value = select.value;
+        // --- 2. Auto Focus Logic ---
+        @if (session('success'))
+            setTimeout(function() {
+                // Select2 focus karanna kalin eka initialize wela thiyenna ona
+                $('#item_slt').select2('open');
+            }, 500); // Milliseconds 500 k wage podi delay ekak danna
+        @endif
+    });
+</script>
+
+<script>
+    // Select2 search field eka focus karanna
+    $(document).on('select2:open', () => {
+        // Search box eka auto focus wenna delay ekak thibbama thama hariyata weda karanne
+        setTimeout(() => {
+            const searchField = document.querySelector('.select2-search__field');
+            if (searchField) {
+                searchField.focus();
+            }
+        }, 50);
     });
 </script>
 
