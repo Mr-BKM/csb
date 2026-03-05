@@ -255,7 +255,7 @@
 
                             <div class="mb-3 d-flex align-items-center">
                                 <label class="me-3 mb-0" style="width: 150px;">Unit Price :</label>
-                                <input type="number" class="form-control" name="itm_unit_price"
+                                <input type="number" step="any" class="form-control" name="itm_unit_price"
                                     id="itm_unit_price_{{ $orderm->id }}" value="{{ $orderm->itm_unit_price }}">
                             </div>
 
