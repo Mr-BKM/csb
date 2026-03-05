@@ -92,7 +92,7 @@
 
                                             <!-- Quantity -->
                                             <div style="width: 150px;">
-                                                <input type="number" class="form-control" name="itm_qty" id="itm_qty"
+                                                <input type="number" class="form-control" name="itm_qty" id="itm_qty" step="any"
                                                     placeholder="Enter Item Qty" required>
                                             </div>
 

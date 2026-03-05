@@ -376,7 +376,7 @@
 
 
 
-    <script>
+    <!-- <script>
         (function() {
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -494,7 +494,158 @@
                 });
             });
         })();
-    </script>
+    </script> -->
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. Data Array Preparation
+        const data = [
+            @foreach ($orderms as $orderm)
+                [
+                    "{{ $loop->iteration }}",
+                    "{{ $orderm->order_date }}",
+                    "{{ $orderm->order_id }}",
+                    "{{ $orderm->cus_name }}",
+                    "{{ $orderm->itm_code }}",
+                    gridjs.html(`{!! $orderm->item->itm_name ?? '-' !!}`),
+                    "{{ $orderm->itm_qty }}",
+                    "{{ $orderm->po_date }}",
+                    "{{ $orderm->po_number }}",
+                    "{{ $orderm->sup_name }}",
+                    "{{ $orderm->received->sum('itm_res_qty') ?: '-' }}",
+                    gridjs.html(
+                        `<div style="display: inline-flex; align-items: center; gap: 6px;">
+                            <button class="btn btn-sm btn-info update-btn" data-id="{{ $orderm->id }}" title="Update Order">
+                                <i class="fas fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger cancel-btn" data-id="{{ $orderm->id }}" title="Cancel Order">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`
+                    )
+                ]
+                @if (!$loop->last) , @endif
+            @endforeach
+        ];
+
+        // 2. Grid.js Initialization
+        const grid = new gridjs.Grid({
+            columns: [
+                "No", "Order Date", "Order ID", "Customer Name", "Item Code", "Item Name", 
+                "Item QTY", "PO Date", "PO Number", "Supplier Name", "Rec.QTY",
+                { name: "Update", sort: false, width: "100px" }
+            ],
+            data,
+            search: true,
+            sort: true,
+            pagination: { enabled: true, limit: 10 },
+            className: {
+                table: 'table table-bordered table-hover mb-0',
+                th: 'bg-light text-center',
+                td: 'text-center align-middle'
+            },
+            language: { search: { placeholder: 'Search Orders...' } },
+            html: true
+        }).render(document.getElementById("table-gridjs"));
+
+        // 3. Calculation Logic Function
+        function runCalculations(id) {
+            const qtyInput = document.getElementById(`itm_res_qty_${id}`);
+            const priceInput = document.getElementById(`itm_unit_price_${id}`);
+            const totalInput = document.getElementById(`itm_tot_price_${id}`);
+            const totalRecQtyInput = document.getElementById(`itm_tot_res_qty${id}`);
+            const prevRecQtyInput = document.getElementById(`itm_prev_rec_qty_${id}`);
+            const totalOrderQtyInput = document.getElementById(`itm_qty_${id}`);
+            const warrantyInput = document.getElementById(`itm_warranty_${id}`);
+            const radioYes = document.getElementById(`inlineRadio1_${id}`);
+            const radioNo = document.getElementById(`inlineRadio2_${id}`);
+
+            if (!qtyInput || !priceInput) return;
+
+            const prevQty = parseFloat(prevRecQtyInput.value) || 0;
+            const orderTotal = parseFloat(totalOrderQtyInput.value) || 0;
+
+            function updateValues() {
+                // Price Calculation
+                const qty = parseFloat(qtyInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+                totalInput.value = (qty * price).toFixed(2);
+
+                // Rec Qty & Radio Status
+                const currentTotal = prevQty + qty;
+                totalRecQtyInput.value = currentTotal;
+
+                if (currentTotal >= orderTotal && currentTotal > 0) {
+                    if(radioYes) radioYes.checked = true;
+                } else {
+                    if(radioNo) radioNo.checked = true;
+                }
+            }
+
+            qtyInput.oninput = updateValues;
+            priceInput.oninput = updateValues;
+
+            // Warranty logic (Shortcuts)
+            if(warrantyInput) {
+                warrantyInput.oninput = function() {
+                    let v = warrantyInput.value.trim().toLowerCase();
+                    if (v === "l") { warrantyInput.value = "Lifetime"; return; }
+                    const match = v.match(/^(\d+)\s*(y|m|d)$/);
+                    if (match) {
+                        const num = parseInt(match[1]);
+                        const type = match[2];
+                        const label = type === "y" ? "Year" : type === "m" ? "Month" : "Day";
+                        warrantyInput.value = num + " " + (num > 1 ? label + "s" : label);
+                    }
+                };
+            }
+
+            updateValues(); // Initial trigger
+        }
+
+        // 4. EVENT DELEGATION (Fixed: Handles Pagination & Search issues)
+        document.addEventListener('click', function (e) {
+            const updateBtn = e.target.closest('.update-btn');
+            const cancelBtn = e.target.closest('.cancel-btn');
+
+            if (updateBtn) {
+                e.preventDefault();
+                const id = updateBtn.dataset.id;
+                const modalEl = document.getElementById(`UpdateModalCenter${id}`);
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    setTimeout(() => runCalculations(id), 300);
+                }
+            }
+
+            if (cancelBtn) {
+                e.preventDefault();
+                const id = cancelBtn.dataset.id;
+                const modalEl = document.getElementById(`deleteModal${id}`);
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                }
+            }
+        });
+
+        // 5. MODAL STYLE FIX (Prevents table freezing after close)
+        document.addEventListener('hidden.bs.modal', function () {
+            // Remove lingering backdrops and fix body scrolling
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(b => b.remove());
+            
+            // Clear focus from buttons
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+        });
+    });
+</script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
