@@ -84,9 +84,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/orderm/delete/{id}', [OrdermController::class, 'deleteData'])->name('orderm.deleteData');
     Route::post('/orderm/finish-order', [OrdermController::class, 'finishOrder'])->name('orderm.finishOrder');
     Route::post('/order/mark-pending', [OrdermController::class, 'markPending'])->name('orderm.markPending');
-    Route::get('/orderprint/{order_id}', [OrdermController::class, 'printView'])
-        ->where('order_id', '.*')
-        ->name('orderm.orderprint');
+    Route::get('/orderprint/{order_id}', [OrdermController::class, 'printView'])->where('order_id', '.*')->name('orderm.orderprint');
 
     Route::post('/order/loadPendingOrder', [OrdermController::class, 'loadPendingOrder'])->name('orderm.loadPendingOrder');
     Route::post('/orderm/loadreorderlevelorder', [OrdermController::class, 'loadreorderlevelorder'])->name('orderm.loadreorderlevelorder');

@@ -39,7 +39,7 @@ class OrdermController extends Controller
         if ($lastRunningOrder) {
             $neworderId = $lastRunningOrder->order_id;
 
-        // CASE 2: If Auto or Completed orders exist, calculate the next sequence number.
+            // CASE 2: If Auto or Completed orders exist, calculate the next sequence number.
         } elseif ($lastAutoOrder || $lastCompleteOrder) {
             // Use regex to extract the numeric suffix from the last known IDs
             preg_match('/(\d+)$/', $lastAutoOrder->order_id ?? '', $autoMatch);
@@ -54,7 +54,7 @@ class OrdermController extends Controller
             // Format the new ID: THA/FP/[Year]/[00X]
             $neworderId = 'THA/FP/' . $currentYear . '/' . str_pad($lastNumber, 3, '0', STR_PAD_LEFT);
 
-        // CASE 3: If this is the first order of the system/year, start with 001.
+            // CASE 3: If this is the first order of the system/year, start with 001.
         } else {
             $neworderId = 'THA/FP/' . $currentYear . '/001';
         }
@@ -75,12 +75,12 @@ class OrdermController extends Controller
     {
         // Define validation rules for the temporary item
         $rules = [
-            'order_id'   => 'required|string|max:20',
-            'cus_name'   => 'required|string|max:255',
-            'cus_id'     => 'required|string|max:255',
-            'itm_code'   => 'required|string|max:15',
-            'itm_qty'    => 'required|string|max:255',
-            'order_typ'  => 'required|string|max:255',
+            'order_id' => 'required|string|max:20',
+            'cus_name' => 'required|string|max:255',
+            'cus_id' => 'required|string|max:255',
+            'itm_code' => 'required|string|max:15',
+            'itm_qty' => 'required|string|max:255',
+            'order_typ' => 'required|string|max:255',
             'order_date' => 'required|string|max:255',
         ];
 
@@ -88,7 +88,7 @@ class OrdermController extends Controller
         $messages = [
             'order_id.required' => 'Order ID is required.',
             'itm_code.required' => 'Item Code is required.',
-            'itm_qty.required'  => 'Item QTY is required.',
+            'itm_qty.required' => 'Item QTY is required.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -107,9 +107,9 @@ class OrdermController extends Controller
     {
         $rules = [
             'cus_name' => 'required|string|max:255',
-            'cus_id'   => 'required|string|max:255',
+            'cus_id' => 'required|string|max:255',
             'itm_code' => 'required|string|max:15',
-            'itm_qty'  => 'required|string|max:255',
+            'itm_qty' => 'required|string|max:255',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -140,7 +140,9 @@ class OrdermController extends Controller
             $ordertemp->delete();
             return redirect()->back()->with('success', 'Order Item deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to delete: ' . $e->getMessage());
         }
     }
 
@@ -161,28 +163,28 @@ class OrdermController extends Controller
         foreach ($pendingItems as $item) {
             // Move item to the permanent 'Orderm' table with 'Finish' status
             Orderm::create([
-                'order_id'   => $item->order_id,
-                'cus_id'     => $item->cus_id,
-                'cus_name'   => $item->cus_name,
-                'itm_code'   => $item->itm_code,
-                'itm_qty'    => $item->itm_qty,
-                'order_typ'  => 'Finish',
+                'order_id' => $item->order_id,
+                'cus_id' => $item->cus_id,
+                'cus_name' => $item->cus_name,
+                'itm_code' => $item->itm_code,
+                'itm_qty' => $item->itm_qty,
+                'order_typ' => 'Finish',
                 'order_date' => $item->order_date,
             ]);
 
-            // Update the master item record status to indicate it is now ordered
+            // Update the master item record status
             Item::where('itm_code', $item->itm_code)->update(['itm_status' => 'ordered']);
         }
 
         // Remove the processed items from the temporary table
         Ordertemp::where('order_id', $orderId)->where('order_typ', 'Running')->delete();
 
-        $encodedOrderId = urlencode($orderId);
-
+        // --- MEKA WENAS KARANNA ---
+        // urlencode karanna epa, route ekenma ID eka pass karanna
         return redirect()
             ->back()
             ->with('success', 'Order successfully finished')
-            ->with('print_url', route('orderm.orderprint', ['order_id' => $encodedOrderId]));
+            ->with('print_url', route('orderm.orderprint', ['order_id' => $orderId]));
     }
 
     /**
@@ -210,7 +212,7 @@ class OrdermController extends Controller
         // Update all associated items to the new Pending ID and Type
         Ordertemp::where('order_id', $orderId)->update([
             'order_typ' => 'Pending',
-            'order_id'  => $newPendingOrderId,
+            'order_id' => $newPendingOrderId,
         ]);
 
         return redirect()->back()->with('success', 'Order marked as Pending successfully');
@@ -266,7 +268,7 @@ class OrdermController extends Controller
 
         // Change the ID from P-series back to the standard THA/FP format and set type to Running
         $updatedRows = Ordertemp::where('order_id', $pendingOrderId)->update([
-            'order_id'  => $newRunningOrderId,
+            'order_id' => $newRunningOrderId,
             'order_typ' => 'Running',
         ]);
 
