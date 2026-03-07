@@ -3,64 +3,69 @@
 <!-- ==================================================== -->
 @section('content')
     <style>
-        /* ✅ Fix blank second page and clean print */
         @media print {
             @page {
                 size: A4;
                 margin: 10mm;
             }
 
-            html,
-            body {
-                width: 210mm;
-                height: auto !important;
-                margin: 0;
-                padding: 0;
-                overflow: visible !important;
-                background: none !important;
-            }
-
-            /* Remove Bootstrap card shadow/margin that causes extra space */
-            .card,
-            .card-body,
+            /* Content eka madi hariyen kedenna dena eka nawaththanna */
             .container-fluid,
             .row,
-            .col-12 {
-                box-shadow: none !important;
-                border: none !important;
-                margin: 0 !important;
+            .card,
+            .card-body {
+                page-break-inside: avoid !important;
+                display: block !important;
                 padding: 0 !important;
-                page-break-inside: avoid !important;
+                margin: 0 !important;
             }
 
-            /* Table fix to prevent overflow and extra height */
+            /* Table eka lassanata fit karanna */
             table {
-                page-break-inside: auto !important;
+                width: 100% !important;
                 border-collapse: collapse !important;
+                table-layout: auto !important;
+                page-break-inside: auto;
+                margin-bottom: 15px !important;
             }
 
-            tr,
-            td,
-            th {
-                page-break-inside: avoid !important;
-                page-break-after: auto !important;
+            th,
+            td {
+                border: 1px solid black !important;
+                padding: 8px !important;
+                font-size: 13px !important;
+                color: black !important;
+                white-space: normal !important;
+                word-wrap: break-word !important;
             }
 
-            /* Hide all non-print buttons or page UI */
-            .btn,
-            .d-print-none {
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            /* Space control */
+            .mt-3,
+            .mt-5 {
+                margin-top: 10px !important;
+            }
+
+            .mb-1,
+            .mb-2 {
+                margin-bottom: 5px !important;
+            }
+
+            /* Blank spaces control */
+            br {
+                content: "";
+                display: block;
+                margin: 5px 0;
+            }
+
+            .d-print-none,
+            .btn {
                 display: none !important;
             }
-
-            /* Prevent forced min-heights from Bootstrap */
-            * {
-                max-height: 100% !important;
-            }
-        }
-
-        /* ✅ Optional fine-tuning for screen view */
-        .card-title {
-            margin-bottom: 0.3rem !important;
         }
     </style>
     <!-- Start Container Fluid -->
@@ -111,25 +116,24 @@
 
                         <div class="row">
                             <div class="col-12">
-                                <div class="table-responsive table-borderless text-nowrap mt-3 table-centered">
-                                    <table class="table mb-0">
-                                        <thead class="bg-light bg-opacity-50">
-                                            <tr class="border-bottom">
-                                                <th class="border-0 py-2">අනු අංක</th>
-                                                <th class="border-0 py-2">ද්‍රව්‍ය</th>
-                                                <th class="border-0 py-2">විස්තරය</th>
-                                                <th class="border-0 py-2" style="text-align: center;">ගබඩා ශේෂය</th>
-                                                <th class="border-0 py-2" style="text-align: center;">මිනුම් ඒකකය</th>
-                                                <th class="border-0 py-2" style="text-align: center;">ඉල්ලා සිටින ප‍්‍රමාණය
-                                                </th>
+                                <div class="mt-3">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>අනු අංක</th>
+                                                <th>ද්‍රව්‍ය</th>
+                                                <th>විස්තරය</th>
+                                                <th style="text-align: center;">ගබඩා ශේෂය</th>
+                                                <th style="text-align: center;">මිනුම් ඒකකය</th>
+                                                <th style="text-align: center;">ඉල්ලා සිටින ප්‍රමාණය</th>
                                             </tr>
-                                        </thead> <!-- end thead -->
-
+                                        </thead>
                                         <tbody>
                                             @foreach ($orderDetails as $index => $orderm)
-                                                <tr class="border-bottom">
+                                                <tr>
                                                     <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $orderm->item->itm_name ?? ($orderm->itm_name ?? 'N/A') }}</td>
+                                                    <td>{{ $orderm->item->itm_name ?? ($orderm->itm_name ?? 'N/A') }}
+                                                    </td>
                                                     <td>{{ $orderm->item->itm_barcode ?? ($orderm->itm_barcode ?? 'N/A') }}
                                                     </td>
                                                     <td style="text-align: center;">
@@ -142,30 +146,34 @@
                                                 </tr>
                                             @endforeach
                                         </tbody>
-                                    </table> <!-- end table -->
-                                </div> <!-- end table responsive -->
+                                    </table>
+                                </div><!-- end table -->
                             </div> <!-- end col -->
                         </div> <!-- end row -->
 
-                        <div class="row mt-3">
-                            <address>
-                                <br><br><br>.....................................<br>
-                                ගබඩා භාර කළමනාකරණ සහකාර,<br>
-                                පාරිභෝජ්‍ය ගබඩාව - B,<br>
-                                ශික්ෂණ රෝහල,<br>
-                                අනුරාධපුර.<br>
-                                <abbr title="Date"></abbr> {{ $orderDate }}
-                            </address>
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <div style="margin-top: 40px;">
+                                    .....................................<br>
+                                    ගබඩා භාර කළමනාකරණ සහකාර,<br>
+                                    පාරිභෝජ්‍ය ගබඩාව - B,<br>
+                                    ශික්ෂණ රෝහල,<br>
+                                    අනුරාධපුර.<br>
+                                    {{ $orderDate }}
+                                </div>
 
-                            <h5><br>ලියාපදිංචි සැපයුම්කරුවන් / ජාතික තරගකාරි ලංසු කැඳවීමේ ක‍්‍රමය මගින් මිල ගණන් කැඳවීමට
-                                අනුමත කරමි.</h5><br><br><br><br><br>
+                                <h5 style="margin-top: 20px; font-weight: bold;">
+                                    ලියාපදිංචි සැපයුම්කරුවන් / ජාතික තරගකාරි ලංසු කැඳවීමේ ක‍්‍රමය මගින් මිල ගණන් කැඳවීමට
+                                    අනුමත කරමි.
+                                </h5>
 
-                            <address>
-                                .....................................<br>
-                                අධ්‍යක්ෂ,<br>
-                                ශික්ෂණ රෝහල,<br>
-                                අනුරාධපුර.<br>
-                            </address>
+                                <div style="margin-top: 40px;">
+                                    .....................................<br>
+                                    අධ්‍යක්ෂ,<br>
+                                    ශික්ෂණ රෝහල,<br>
+                                    අනුරාධපුර.
+                                </div>
+                            </div>
                         </div> <!-- end row -->
 
                         <div class="mt-5 mb-1">
