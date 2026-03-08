@@ -16,6 +16,7 @@ use App\Http\Controllers\ModifyorderController;
 use App\Http\Controllers\OrderaController;
 use App\Http\Controllers\OrdermController;
 use App\Http\Controllers\OrderPrintController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubGroupController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -152,4 +153,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/allmigration', [allmigrationController::class, 'showData'])->name('allmigration.showData');
     Route::post('/migration/group/import', [allmigrationController::class, 'importGroupExcel'])->name('group.excel.import');
     Route::post('/migration/import', [allmigrationController::class, 'importGeneral'])->name('allmigration.import');
+
+
 });
+Route::get('/download-report', [ReportController::class, 'downloadReport']);
