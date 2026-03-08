@@ -136,8 +136,6 @@ class IssuingController extends Controller
     //     }
     // }
 
-
-
     public function tempsaveData(Request $request)
 {
     // 1. Basic Validation (Empty fields etc.)
@@ -164,7 +162,7 @@ class IssuingController extends Controller
 
         if ($isFinished) {
             // Meka thrown unama catch block ekata auto yanawa
-            throw new \Exception("❌ This Issue Number is already 'Issued'. You cannot add more items.");
+            throw new \Exception("This Issue Number is already 'Issued'. You cannot add more items.");
         }
 
         // --- 3. Database Transaction ---
@@ -201,7 +199,7 @@ class IssuingController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', 'Item added successfully!');
+        return redirect()->back()->with('success temp', 'Item added successfully!');
 
     } catch (\Exception $e) {
         // Database error ekak unath, Stock madi unath, 'Issued' check eka fail unath
