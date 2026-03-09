@@ -601,28 +601,26 @@
             hidden.value = select.value;
         }
 
-        // --- 2. Auto Focus Logic ---
-        @if (session('success temp'))
-            setTimeout(function() {
-                // Select2 focus karanna kalin eka initialize wela thiyenna ona
-                $('#item_slt').select2('open');
-            }, 500); // Milliseconds 500 k wage podi delay ekak danna
-        @endif
-
-        // // --- 3. Auto Focus Logic ---
-        // @if (session('success'))
-        //     setTimeout(function() {
-        //         const dateInput = document.getElementById('date-picker');
-
-        //         // Date eka readonly nathi welawata witharak eka focus karanawa
-        //         if (dateInput && !dateInput.readOnly) {
-        //             dateInput.focus();
-        //         } else {
-        //             // Readonly nam kelinma Select2 eka open karanawa
-        //             $('#item_slt').select2('open');
-        //         }
-        //     }, 500);
-        // @endif
+        // 1. Success temp session eka thiyeda balanna
+    @if (session('success temp'))
+        setTimeout(function() {
+            // Select2 element eka thiyenawada kiyala confirm karaganna
+            let itemSelect = $('#item_slt');
+            
+            if (itemSelect.length) {
+                // Focus eka ganna kalin dropdown eka open karamu
+                itemSelect.select2('open');
+                
+                // Select2 search field eka thawa parak focus karamu (Force focus)
+                setTimeout(() => {
+                    const searchField = document.querySelector('.select2-search__field');
+                    if (searchField) {
+                        searchField.focus();
+                    }
+                }, 100);
+            }
+        }, 800); // 500ms madi wenna puluwan live site ekakata, 800ms wage danna
+    @endif
     });
 </script>
 
