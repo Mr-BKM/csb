@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderPrintController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubGroupController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ExcessitemController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -153,6 +154,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/allmigration', [allmigrationController::class, 'showData'])->name('allmigration.showData');
     Route::post('/migration/group/import', [allmigrationController::class, 'importGroupExcel'])->name('group.excel.import');
     Route::post('/migration/import', [allmigrationController::class, 'importGeneral'])->name('allmigration.import');
+
+    Route::get('/excessitem', [ExcessitemController::class, 'showData'])->name('excessitem.showData');
+    Route::post('/excessitem/tempsaveData', [ExcessitemController::class, 'tempsaveData'])->name('excessitem.tempsaveData');
+    Route::post('/excessitem/update/{id}', [ExcessitemController::class, 'updateData'])->name('excessitem.updateData');
+    Route::get('/excessitem/delete/{id}', [ExcessitemController::class, 'deleteData'])->name('excessitem.deleteData');
+    Route::post('/excessitem/finish-order', [ExcessitemController::class, 'finishOrder'])->name('excessitem.finishOrder');
 
 
 });
