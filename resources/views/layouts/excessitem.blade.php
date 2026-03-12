@@ -54,14 +54,14 @@
         // --- 1. Save Modal (Initialized on document ready) ---
         $(function() {
 
-        $(document).on('select2:open', function(e) {
-            window.setTimeout(function () {
-                const searchField = document.querySelector('.select2-search__field');
-                if (searchField) {
-                    searchField.focus();
-                }
-            }, 10); // Miliseconds 10 k delay ekak dunnama browser eken focus eka block karanne na
-        });
+            $(document).on('select2:open', function(e) {
+                window.setTimeout(function() {
+                    const searchField = document.querySelector('.select2-search__field');
+                    if (searchField) {
+                        searchField.focus();
+                    }
+                }, 10); // Miliseconds 10 k delay ekak dunnama browser eken focus eka block karanne na
+            });
             // Customer
             $('#customer_slt').select2({
                 theme: "bootstrap-5",
@@ -121,14 +121,16 @@
 
                 updateItemStateDisplay();
 
-                $('#itm_qty').focus();
+                setTimeout(function() {
+                    $('#itm_qty').focus();
+                }, 100);
             });
         });
 
         // --- 2. Update Modals (Initialized when the modal is SHOWN) ---
         // ... (Previous code)
 
-        $('.modal').on('shown.bs.modal', function () {
+        $('.modal').on('shown.bs.modal', function() {
             // Only target the Customer Update Modals
             if (this.id.startsWith('UpdateModalCenter')) {
                 const cusId = this.id.replace('UpdateModalCenter', '');
@@ -148,15 +150,19 @@
                             url: '{{ route('ajax.customers') }}',
                             dataType: 'json',
                             delay: 250,
-                            data: params => ({ q: params.term }),
-                            processResults: data => ({ results: data }),
+                            data: params => ({
+                                q: params.term
+                            }),
+                            processResults: data => ({
+                                results: data
+                            }),
                             cache: true
                         },
                         minimumInputLength: 1
-                    }).on('select2:select', function (e) {
+                    }).on('select2:select', function(e) {
                         var data = e.params.data;
-                         $(cusIdInput).val(data.id);
-                         $(cusNameInput).val(data.text);
+                        $(cusIdInput).val(data.id);
+                        $(cusNameInput).val(data.text);
                     });
                 }
 
@@ -174,12 +180,16 @@
                             url: '{{ route('ajax.items') }}',
                             dataType: 'json',
                             delay: 250,
-                            data: params => ({ q: params.term }),
-                            processResults: data => ({ results: data }),
+                            data: params => ({
+                                q: params.term
+                            }),
+                            processResults: data => ({
+                                results: data
+                            }),
                             cache: true
                         },
                         minimumInputLength: 1
-                    }).on('select2:select', function (e) {
+                    }).on('select2:select', function(e) {
                         var data = e.params.data;
                         $(itemIdInput).val(data.id);
                         $(itemNameInput).val(data.text);
@@ -187,8 +197,6 @@
                 }
             }
         });
-
-
     </script>
 
 </body>

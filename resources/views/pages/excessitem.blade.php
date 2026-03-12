@@ -52,13 +52,16 @@
                                         <div class="d-flex align-items-center gap-2 flex-wrap">
                                             <!-- Order ID -->
                                             <div style="width: 180px;">
-                                                <input type="text" class="form-control" id="order_id"
-                                                    placeholder="Order Id" value="{{ $neworderId }}" @if(!empty($neworderId)) readonly @endif required>
-                                                <input type="hidden" name="order_id" value="{{ $neworderId }}">
+                                                <input type="text" class="form-control" name="order_id" id="order_id"
+                                                    placeholder="Order Id" value="{{ $neworderId }}"
+                                                    @if (!empty($neworderId)) readonly @endif required>
+                                                {{-- <input type="hidden" name="order_id" value="{{ $neworderId }}"> --}}
                                             </div>
                                             <div style="width: 180px;">
-                                                <input type="date" id="date-picker" name="order_date" class="form-control"
-                                                placeholder="Select Date" value="{{ old('order_date', $currentOrderDate) }}" @if(!empty($currentOrderDate)) readonly @endif required>
+                                                <input type="date" id="date-picker" name="order_date"
+                                                    class="form-control" placeholder="Select Date"
+                                                    value="{{ old('order_date', $currentOrderDate) }}"
+                                                    @if (!empty($currentOrderDate)) readonly @endif required>
                                             </div>
                                         </div>
                                         <br>
@@ -215,8 +218,10 @@
                                                             </button>
                                                             <!-- Modal Update -->
                                                             <div class="modal fade"
-                                                                id="UpdateModalCenter{{ $excessitem->id }}" tabindex="-1"
-                                                                aria-labelledby="SaveModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                                                                id="UpdateModalCenter{{ $excessitem->id }}"
+                                                                tabindex="-1" aria-labelledby="SaveModalCenterTitle"
+                                                                aria-hidden="true" data-bs-backdrop="static"
+                                                                data-bs-keyboard="false">
                                                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                                                     <div class="modal-content">
                                                                         <form method="POST"
@@ -375,7 +380,7 @@
                             </div>
                         </div>
                         <!-- End Table View -->
-                          @if ($excessitems->isNotEmpty())
+                        @if ($excessitems->isNotEmpty())
                             <div class="col-12 text-end mb-3 d-flex justify-content-end gap-3">
                                 <button type="button" class="btn btn-success" data-bs-toggle="modal"
                                     data-bs-target="#finishOrderModal{{ $neworderId }}">
