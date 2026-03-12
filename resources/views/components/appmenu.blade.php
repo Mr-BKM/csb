@@ -688,6 +688,15 @@
                               <span class="nav-text"> Migration </span>
                           </a>
                       </li>
+
+                      <li class="nav-item">
+                          <a class="nav-link" href="/excessitem">
+                              <span class="nav-icon">
+                                  <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
+                              </span>
+                              <span class="nav-text"> Excess item </span>
+                          </a>
+                      </li>
                       @endif
 
                   </ul>
