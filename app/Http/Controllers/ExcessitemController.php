@@ -94,7 +94,7 @@ class ExcessitemController extends Controller
 
         // Run the validation
         $validator = Validator::make($request->all(), $rules, $messages);
-        
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -129,7 +129,7 @@ class ExcessitemController extends Controller
         // Apply validated updates to the record
         $ordertemp->update($validator->validated());
 
-        return redirect()->back()->with('success', 'Order Item updated successfully.');
+        return redirect()->back()->with('success', 'Excess Item updated successfully.');
     }
 
     /**
@@ -145,7 +145,7 @@ class ExcessitemController extends Controller
             }
 
             $ordertemp->delete();
-            return redirect()->back()->with('success', 'Order Item deleted successfully.');
+            return redirect()->back()->with('success', 'Excess Item deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete: ' . $e->getMessage());
         }
@@ -158,7 +158,7 @@ class ExcessitemController extends Controller
     public function finishOrder(Request $request)
     {
         $orderId = $request->input('order_id');
-        
+
         // Retrieve all temporary items for the current session
         $pendingItems = Ordertemp::where('order_id', $orderId)
                                  ->where('order_typ', 'excessitem')
@@ -171,7 +171,7 @@ class ExcessitemController extends Controller
         // Use a Transaction to wrap all DB operations
         DB::transaction(function () use ($pendingItems, $orderId, $request) {
             foreach ($pendingItems as $item) {
-                
+
                 // 1. CREATE MASTER ORDER RECORD (Orderm)
                 // This converts the temporary item into a permanent order entry
                 $orderm = Orderm::create([
@@ -249,6 +249,6 @@ class ExcessitemController extends Controller
                      ->delete();
         });
 
-        return redirect()->back()->with('success', 'Order successfully finished and stock updated.');
+        return redirect()->back()->with('success', 'Successfully Excess Item stock updated.');
     }
 }
