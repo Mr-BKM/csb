@@ -185,11 +185,10 @@
                                             <thead class="bg-light bg-opacity-50">
                                                 <tr>
                                                     <th class="border-0 py-2">No</th>
-                                                    <th class="border-0 py-2">Customer</th>
                                                     <th class="border-0 py-2">Item Code</th>
                                                     <th class="border-0 py-2">Item Name</th>
                                                     <th class="border-0 py-2">Unit of Measure</th>
-                                                    <th class="border-0 py-2">Stock in Hand</th>
+                                                    <th class="border-0 py-2">Page No</th>
                                                     <th class="border-0 py-2">QTY</th>
                                                     <th class="border-0 py-2">Action</th>
                                                 </tr>
@@ -198,11 +197,10 @@
                                                 @forelse ($excessitems as $excessitem)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $excessitem->cus_name }}</td>
                                                         <td>{{ $excessitem->itm_code }}</td>
                                                         <td>{{ $excessitem->item->itm_name ?? '-' }}</td>
                                                         <td>{{ $excessitem->item->itm_unit_of_measure ?? '-' }}</td>
-                                                        <td>{{ $excessitem->item->itm_stock ?? '-' }}</td>
+                                                        <td>{{ $excessitem->item->itm_page_num ?? '-' }}</td>
                                                         <td>{{ $excessitem->itm_qty }}</td>
                                                         <td>
                                                             <button type="button"

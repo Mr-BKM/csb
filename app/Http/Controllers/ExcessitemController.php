@@ -76,7 +76,7 @@ class ExcessitemController extends Controller
     {
         // Define strict validation rules
         $rules = [
-            'order_id'   => 'required|string|max:20',
+            'order_id'   => 'required|string|max:30',
             'cus_name'   => 'required|string|max:255',
             'cus_id'     => 'required|string|max:255',
             'itm_code'   => 'required|string|max:15',
