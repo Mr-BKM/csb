@@ -56,91 +56,11 @@ class IssuingController extends Controller
         ]);
     }
 
-    /**
-     * Temporarily save an item to the issue list and update inventory levels.
-     */
-
-    // public function tempsaveData(Request $request)
-    // {
-    //     // Define validation rules for the incoming request
-    //     $rules = [
-    //         'issue_id' => 'required|string|max:20',
-    //         'issue_typ' => 'required|string|max:255',
-    //         'cus_name' => 'required|string|max:255',
-    //         'cus_id' => 'required|string|max:255',
-    //         'itm_code' => 'required|string|exists:items,itm_code', // Validates item exists
-    //         'itm_qty' => 'required|numeric|min:0.01', // Ensures positive decimal value
-    //         'issue_date' => 'required|date', // Ensures a valid date format
-    //     ];
-
-    //     // Custom error messages for better user experience
-    //     $messages = [
-    //         'itm_code.exists' => 'The selected Item Code does not exist in our inventory.',
-    //         'itm_qty.numeric' => 'The quantity must be a valid number.',
-    //     ];
-
-    //     $validator = Validator::make($request->all(), $rules, $messages);
-
-    //     // If validation fails, redirect back with errors
-    //     if ($validator->fails()) {
-    //         return redirect()->back()->withErrors($validator)->withInput();
-    //     }
-
-    //     try {
-    //         // Start a Database Transaction to ensure data integrity
-    //         DB::transaction(function () use ($request) {
-    //             // Fetch the item and lock the row to prevent other users from updating it at the same time
-    //             $item = Item::where('itm_code', $request->itm_code)->lockForUpdate()->first();
-
-    //             if ($item) {
-    //                 // Convert values to float for accurate mathematical operations
-    //                 $currentBookStock = floatval($item->itm_book_stock);
-    //                 $qtyToDeduct = floatval($request->itm_qty);
-    //                 $loanStock = floatval($item->itm_loan_stock ?? 0);
-
-    //                 // Check if enough stock is available to fulfill the request
-    //                 if ($currentBookStock < $qtyToDeduct) {
-    //                     throw new \Exception('Insufficient stock! Available Book Stock: ' . $currentBookStock);
-    //                 }
-
-    //                 // Update Book Stock
-    //                 $item->itm_book_stock = $currentBookStock - $qtyToDeduct;
-
-    //                 // Re-calculate Physical Stock (Physical = Book Stock - Loan Stock)
-    //                 $item->itm_stock = $item->itm_book_stock - $loanStock;
-
-    //                 // Save updated values back to the Items table
-    //                 $item->save();
-
-    //                 // Create a record in the Issuing table for historical tracking
-    //                 $this->issuing->create([
-    //                     'issue_id' => $request->issue_id,
-    //                     'issue_typ' => $request->issue_typ,
-    //                     'cus_name' => $request->cus_name,
-    //                     'cus_id' => $request->cus_id,
-    //                     'itm_code' => $request->itm_code,
-    //                     'itm_stockinhand' => $currentBookStock, // Log the stock level before this deduction
-    //                     'itm_qty' => $qtyToDeduct,
-    //                     'issue_date' => $request->issue_date,
-    //                 ]);
-    //             } else {
-    //                 throw new \Exception('Item record not found in the system.');
-    //             }
-    //         });
-
-    //         // Redirect on success
-    //         return redirect()->back()->with('success', 'Item issued successfully and stock levels updated.');
-    //     } catch (\Exception $e) {
-    //         // Catch any errors (stock issues or DB errors) and return with the message
-    //         return redirect()->back()->with('error', $e->getMessage())->withInput();
-    //     }
-    // }
-
     public function tempsaveData(Request $request)
 {
     // 1. Basic Validation (Empty fields etc.)
     $validator = Validator::make($request->all(), [
-        'issue_id'   => 'required|string|max:20',
+        'issue_id'   => 'required|string|max:30',
         'itm_code'   => 'required|string|exists:items,itm_code',
         'itm_qty'    => 'required|numeric|min:0.01',
         'cus_id'     => 'required',

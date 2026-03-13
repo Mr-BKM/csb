@@ -39,7 +39,7 @@
             @if ($errors->any())
                 <div class="alert alert-warning alert-dismissible fade show custom-alert" role="alert">
                     <div class="text-center">
-                        <strong>පහත දෝෂ පරීක්ෂා කරන්න:</strong>
+                        <strong>Check the following errors:</strong>
                         <ul class="list-unstyled mb-0 mt-1">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
