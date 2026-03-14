@@ -162,7 +162,7 @@
                 sort: true,
                 pagination: {
                     enabled: true,
-                    limit: 10
+                    limit: 16
                 },
                 className: {
                     table: 'table table-bordered table-hover mb-0',
