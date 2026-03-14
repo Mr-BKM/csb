@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class itemreceivededit extends Model
+class Itemreceivededit extends Model
 {
     //
 }

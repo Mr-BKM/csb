@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class orderm extends Model
+class Orderm extends Model
 {
     use HasFactory;
 
@@ -51,6 +51,6 @@ class orderm extends Model
 
         public function received()
     {
-        return $this->hasMany(orderreceived::class, 'table_id', 'id');
+        return $this->hasMany(Orderreceived::class, 'table_id', 'id');
     }
 }
