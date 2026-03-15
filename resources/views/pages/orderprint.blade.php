@@ -6,7 +6,8 @@
         @media print {
             @page {
                 size: A4;
-                margin: 10mm;
+                /*(Top, Right, Bottom, Left)*/
+                margin: 7mm 5mm 5mm 15mm;
             }
 
             /* Content eka madi hariyen kedenna dena eka nawaththanna */
@@ -14,6 +15,7 @@
             .row,
             .card,
             .card-body {
+                color: #000000 !important;
                 page-break-inside: avoid !important;
                 display: block !important;
                 padding: 0 !important;
@@ -22,6 +24,7 @@
 
             /* Table eka lassanata fit karanna */
             table {
+                color: #000000 !important;
                 width: 100% !important;
                 border-collapse: collapse !important;
                 table-layout: auto !important;
@@ -29,7 +32,15 @@
                 margin-bottom: 15px !important;
             }
 
-            th,
+            th {
+        
+        border: 1px solid black !important;
+        font-size: 15px !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        text-align: center;
+        -webkit-print-color-adjust: exact;
+    }
             td {
                 border: 1px solid black !important;
                 padding: 8px !important;
@@ -40,6 +51,7 @@
             }
 
             tr {
+                color: #000000 !important;
                 page-break-inside: avoid;
                 page-break-after: auto;
             }
@@ -79,7 +91,7 @@
                     <div class="card-body">
                         <div class="row mt-1">
                             <div class="col-md-6">
-                                <h4 class="card-title mb-1">ඇණවුම් අංකය: {{ $order_id }}</h4>
+                                <h5 class="card-title mb-1">ඇණවුම් අංකය: {{ $order_id }}</h5>
                                 <div class="mb-2"></div>
                                 <address>
                                     ඒ. එල්. එම්. සිෆාන්,<br>
@@ -102,9 +114,9 @@
                         <!-- end row -->
 
                         <div class="row">
-                            <h3><b><u>ගබඩා ද්‍රව්‍ය ඇණවුම් කිරීම</u></b></h3>
-                            <h4 class="text-justify" style="text-align: justify;">
-                                පහත සඳහන් ඒකක සඳහා නිකුත් කිරීමට අවශ්‍ය භාණ්ඩ වලින් ප‍්‍රමාණවත් තොග පාරිභෝජ්‍ය ගබඩාව - B සතුව නොමැති බැවින් එම භාණ්ඩ ගබඩාව වෙත සපයා දීම සඳහා අවශ්‍ය කටයුතු සලසා දෙන ලෙස කාරුණිකව ඉල්ලා සිටිමි. </h4>
+                            <h4><strong><u>ගබඩා ද්‍රව්‍ය ඇණවුම් කිරීම</u></strong></h4>
+                            <h5 class="text-justify" style="text-align: justify; color: black;">
+                                පහත සඳහන් ඒකක සඳහා නිකුත් කිරීමට අවශ්‍ය භාණ්ඩ වලින් ප‍්‍රමාණවත් තොග පාරිභෝජ්‍ය ගබඩාව - B සතුව නොමැති බැවින් එම භාණ්ඩ ගබඩාව වෙත සපයා දීම සඳහා අවශ්‍ය කටයුතු සලසා දෙන ලෙස කාරුණිකව ඉල්ලා සිටිමි. </h5>
                         </div>
 
 
@@ -114,19 +126,20 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>අනු අංක</th>
-                                                <th>ද්‍රව්‍ය</th>
-                                                <th>විස්තරය</th>
+                                                <th style="text-align: center;">අනු අංක</th>
+                                                <th style="text-align: center;">ද්‍රව්‍ය හා ඒකකය</th>
+                                                <th style="text-align: center;">විස්තරය</th>
                                                 <th style="text-align: center;">ගබඩා ශේෂය</th>
                                                 <th style="text-align: center;">මිනුම් ඒකකය</th>
                                                 <th style="text-align: center;">ඉල්ලා සිටින ප්‍රමාණය</th>
                                             </tr>
-                                        </thead>
+                                        </thead>	
                                         <tbody>
                                             @foreach ($orderDetails as $index => $orderm)
                                                 <tr>
-                                                    <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $orderm->item->itm_name ?? ($orderm->itm_name ?? 'N/A') }}
+                                                    <td style="text-align: center;">
+                                                        {{ $index + 1 }}</td>
+                                                    <td>{{ $orderm->item->itm_name ?? ($orderm->itm_name ?? 'N/A') }} <br> ({{ $orderm->item->itm_sinhalaname ?? ($orderm->itm_sinhalaname ?? 'N/A') }}) - <strong>({{ $orderm->cus_name }})</strong>
                                                     </td>
                                                     <td>{{ $orderm->item->itm_description ?? ($orderm->itm_description ?? 'N/A') }}
                                                     </td>
@@ -148,12 +161,11 @@
                         <div class="row mt-2">
                             <div class="col-12">
                                 <div style="margin-top: 40px;">
-                                    .....................................<br>
+                                    <br>..............................................<br>
                                     ගබඩා භාර කළමනාකරණ සහකාර,<br>
                                     පාරිභෝජ්‍ය ගබඩාව - B,<br>
                                     ශික්ෂණ රෝහල,<br>
                                     අනුරාධපුර.<br>
-                                    {{ $orderDate }}
                                 </div>
 
                                 <h5 style="margin-top: 20px; font-weight: bold;">
@@ -162,7 +174,7 @@
                                 </h5>
 
                                 <div style="margin-top: 40px;">
-                                    .....................................<br>
+                                    <br>..............................................<br>
                                     අධ්‍යක්ෂ,<br>
                                     ශික්ෂණ රෝහල,<br>
                                     අනුරාධපුර.
