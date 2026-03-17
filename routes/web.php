@@ -12,10 +12,11 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\CancelorderController;
 use App\Http\Controllers\ItemreceivedController;
 use App\Http\Controllers\ItemreceivededitController;
+use App\Http\Controllers\ItemReportController;
 use App\Http\Controllers\ModifyorderController;
 use App\Http\Controllers\OrderaController;
 use App\Http\Controllers\OrdermController;
-use App\Http\Controllers\OrderPrintController;
+// use App\Http\Controllers\OrderPrintController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubGroupController;
 use App\Http\Controllers\SupplierController;
@@ -160,6 +161,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::post('/excessitem/update/{id}', [ExcessitemController::class, 'updateData'])->name('excessitem.updateData');
     Route::get('/excessitem/delete/{id}', [ExcessitemController::class, 'deleteData'])->name('excessitem.deleteData');
     Route::post('/excessitem/finish-order', [ExcessitemController::class, 'finishOrder'])->name('excessitem.finishOrder');
+
+    Route::get('/items-report', [ItemReportController::class, 'index'])->name('items.report');
+Route::get('/items-export', [ItemReportController::class, 'export'])->name('itemsreport.export');
+
+Route::get('/itemsreport', [ItemReportController::class, 'showData'])->name('itemsreport.showData');
 
 
 });

@@ -2,32 +2,32 @@
               @if (auth()->user()->role === 'Admin')
                   <!-- Sidebar Logo -->
                   {{-- <div class="logo-box"> --}}
-                      {{-- <a href="index.html" class="logo-dark">
+                  {{-- <a href="index.html" class="logo-dark">
                          <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
                          <img src="assets/images/logo-dark.png" class="logo-lg" alt="logo dark">
                     </a> --}}
 
-                      {{-- <a href="index.html" class="logo-light">
+                  {{-- <a href="index.html" class="logo-light">
                          <img src="assets/images/logo-sm.png" class="logo-sm" alt="logo sm">
                          <img src="assets/images/logo-light.png" class="logo-lg" alt="logo light">
 
                     </a> --}}
 
 
-                      {{-- <iconify-icon icon="solar:hearts-bold-duotone"
+                  {{-- <iconify-icon icon="solar:hearts-bold-duotone"
                           class="fs-18 align-middle text-danger me-4"></iconify-icon>
                       <a href="/home" class="fw-bold footer-text">H-FLOWSTOCK</a>
 
                   </div> --}}
 
                   <div class="logo-box d-flex align-items-center">
-    <a href="/home" class="d-flex align-items-center text-decoration-none">
-        <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" class="me-4"
-             style="height: 30px; width: auto;">
-        
-        <span class="fw-bold footer-text">H-FLOWSTOCK</span>
-    </a>
-</div>
+                      <a href="/home" class="d-flex align-items-center text-decoration-none">
+                          <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" class="me-4"
+                              style="height: 30px; width: auto;">
+
+                          <span class="fw-bold footer-text">H-FLOWSTOCK</span>
+                      </a>
+                  </div>
               @endif
 
               <!-- Menu Toggle Button (sm-hover) -->
@@ -678,25 +678,33 @@
                       </li> <!-- end Demo Menu Item --> --}}
 
                       @if (auth()->user()->role === 'Admin')
-                      <li class="menu-title">Import/Export</li>
-                     
-                      <li class="nav-item">
-                          <a class="nav-link" href="/allmigration">
-                              <span class="nav-icon">
-                                  <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
-                              </span>
-                              <span class="nav-text"> Migration </span>
-                          </a>
-                      </li>
+                          <li class="menu-title">Import/Export</li>
 
-                      <li class="nav-item">
-                          <a class="nav-link" href="/excessitem">
-                              <span class="nav-icon">
-                                  <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
-                              </span>
-                              <span class="nav-text"> Excess item </span>
-                          </a>
-                      </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/allmigration">
+                                  <span class="nav-icon">
+                                      <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
+                                  </span>
+                                  <span class="nav-text"> Migration </span>
+                              </a>
+                          </li>
+
+                          <li class="nav-item">
+                              <a class="nav-link" href="/excessitem">
+                                  <span class="nav-icon">
+                                      <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
+                                  </span>
+                                  <span class="nav-text"> Excess item </span>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/itemsreport">
+                                  <span class="nav-icon">
+                                      <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
+                                  </span>
+                                  <span class="nav-text"> Item Report View </span>
+                              </a>
+                          </li>
                       @endif
 
                   </ul>
