@@ -152,40 +152,60 @@ class IssuingController extends Controller
      * Mark an entire running order as a 'Loan'.
      */
     public function markLoan(Request $request)
-    {
-        $request->validate(['order_id' => 'required|string']);
+{
+    $request->validate(['order_id' => 'required|string']);
 
-        // Fetch all items currently under this Order ID
-        $items = Issuing::where('issue_id', $request->order_id)->get();
+    // Fetch all items under this Order
+    $items = Issuing::where('issue_id', $request->order_id)->get();
 
-        if ($items->isEmpty()) {
-            return redirect()->back()->with('error', 'No items found for this Order ID.');
-        }
+    if ($items->isEmpty()) {
+        return redirect()->back()->with('error', 'No items found for this Order ID.');
+    }
 
-        DB::transaction(function () use ($items, $request) {
-            // 1. Update the original Issuing table records to 'Loan' status
-            Issuing::where('issue_id', $request->order_id)->update([
+    DB::transaction(function () use ($items, $request) {
+        // 1. Update Issuing status
+        Issuing::where('issue_id', $request->order_id)->update([
+            'issue_id' => 'Loan',
+            'issue_typ' => 'Loan',
+        ]);
+
+        foreach ($items as $issuingRecord) {
+            // 2. Duplicate to Issuingloan table
+            Issuingloan::create([
+                'issue_table_id' => $issuingRecord->id,
                 'issue_id' => 'Loan',
+                'cus_id' => $issuingRecord->cus_id,
+                'itm_code' => $issuingRecord->itm_code,
+                'itm_stockinhand' => $issuingRecord->itm_stockinhand,
+                'itm_qty' => $issuingRecord->itm_qty,
+                'issue_date' => $issuingRecord->issue_date,
                 'issue_typ' => 'Loan',
             ]);
 
-            // 2. Duplicate these records into the Issuingloan table for tracking
-            foreach ($items as $item) {
-                Issuingloan::create([
-                    'issue_table_id' => $item->id, // Reference to the original Issuing ID
-                    'issue_id' => 'Loan',
-                    'cus_id' => $item->cus_id,
-                    'itm_code' => $item->itm_code,
-                    'itm_stockinhand' => $item->itm_stockinhand,
-                    'itm_qty' => $item->itm_qty,
-                    'issue_date' => $item->issue_date,
-                    'issue_typ' => 'Loan',
-                ]);
-            }
-        });
+  
+            // 3. Item master eka hoyala Lock karaganna (Race conditions nawaththanna)
+            $item = Item::where('itm_code', $issuingRecord->itm_code)->lockForUpdate()->first();
 
-        return redirect()->route('issuing.showData')->with('success', 'Order marked as Loan and recorded successfully.');
-    }
+            if ($item) {
+                $qtyToRestore = floatval($issuingRecord->itm_qty);
+
+                // 4. Update itm_loan_stock (Loan ekata ekathu karanna)
+                $item->itm_loan_stock = floatval($item->itm_loan_stock ?? 0) + $qtyToRestore;
+
+                // 5. Add back to Book Stock (Issuing ekedi adu una qty eka restore karanawa)
+                $item->itm_book_stock = floatval($item->itm_book_stock) + $qtyToRestore;
+
+                // 6. Re-calculate Physical Stock
+                // Physical Stock = Book Stock - Loan Stock
+                $item->itm_stock = $item->itm_book_stock - $item->itm_loan_stock;
+
+                $item->save();
+            }
+        }
+    });
+
+    return redirect()->route('issuing.showData')->with('success', 'Order marked as Loan and Stock updated.');
+}
 
     /**
      * Delete an issued item and restore the stock quantities.

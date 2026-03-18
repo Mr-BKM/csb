@@ -223,11 +223,9 @@
                                     <thead class="bg-light bg-opacity-50">
                                         <tr>
                                             <th class="border-0 py-2">No</th>
-                                            <th class="border-0 py-2">Customer</th>
                                             <th class="border-0 py-2">Item Code</th>
                                             <th class="border-0 py-2">Item Name</th>
                                             <th class="border-0 py-2">Unit of Measure</th>
-                                            <th class="border-0 py-2">Old Stock in Hand</th>
                                             <th class="border-0 py-2">QTY</th>
                                             <th class="border-0 py-2">Action</th>
                                         </tr>
@@ -236,11 +234,9 @@
                                         @forelse ($issuings as $issuing)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $issuing->cus_name }}</td>
                                                 <td>{{ $issuing->itm_code }}</td>
                                                 <td>{{ $issuing->item->itm_name ?? '-' }}</td>
                                                 <td>{{ $issuing->item->itm_unit_of_measure ?? '-' }}</td>
-                                                <td>{{ $issuing->itm_stockinhand }}</td>
                                                 <td>{{ $issuing->itm_qty }}</td>
                                                 <td>
                                                     {{-- <button type="button"

@@ -18,32 +18,57 @@ class IssuingLoanController extends Controller
     }
 
     public function finish(Request $request)
-    {
-        $data = $request->validate([
-            'ids' => 'required|array',
-            'issue_date' => 'required|date',
-            'issue_id' => 'required|string',
+{
+    $data = $request->validate([
+        'ids' => 'required|array',
+        'issue_date' => 'required|date',
+        'issue_id' => 'required|string',
+    ]);
+
+    DB::transaction(function () use ($data) {
+        // 1. Issuing records ටික ගන්නවා අදාල qty සහ item code බලාගන්න
+        $itemsToSettle = Issuing::whereIn('id', $data['ids'])->get();
+
+        foreach ($itemsToSettle as $issuingRecord) {
+            // 2. Item Master එක Lock කරලා ගන්නවා
+            $item = Item::where('itm_code', $issuingRecord->itm_code)->lockForUpdate()->first();
+
+            if ($item) {
+                $qty = floatval($issuingRecord->itm_qty);
+
+                // --- OYA ILLAPU LOGIC EKA ---
+                
+                // 3. Book Stock එකෙන් අඩු කරනවා (මොකද මේක දැන් විකුණල ඉවරයි)
+                $item->itm_book_stock = floatval($item->itm_book_stock) - $qty;
+
+                // 4. Loan Stock එකෙනුත් අඩු කරනවා (මොකද මේක දැන් තවදුරටත් Loan එකක් නෙවෙයි)
+                $item->itm_loan_stock = floatval($item->itm_loan_stock ?? 0) - $qty;
+
+                // 5. Physical Stock එක update කරනවා
+                // Equation: Physical = Book - Loan
+                // Example: (100 - 10) = 90 thibba eka, Dan (90 - 0) = 90 wenawa.
+                $item->itm_stock = $item->itm_book_stock - $item->itm_loan_stock;
+
+                $item->save();
+            }
+        }
+
+        // 6. Tables update කරනවා
+        Issuing::whereIn('id', $data['ids'])->update([
+            'issue_date' => $data['issue_date'],
+            'issue_id' => $data['issue_id'],
+            'issue_typ' => 'Issued',
         ]);
 
-        DB::transaction(function () use ($data) {
-            // 1. Issuing table update
-            Issuing::whereIn('id', $data['ids'])->update([
-                'issue_date' => $data['issue_date'],
-                'issue_id' => $data['issue_id'],
-                'issue_typ' => 'Issued',
-            ]);
+        Issuingloan::whereIn('issue_table_id', $data['ids'])->update([
+            'issue_date' => $data['issue_date'],
+            'issue_id' => $data['issue_id'],
+            'issue_typ' => 'Issued',
+        ]);
+    });
 
-            // 2. Issuingloan table update
-            // Poddak balanna migration eke 'issue_table_id' kiyana nama hariyatama liyala thiyeda kiyala
-            Issuingloan::whereIn('issue_table_id', $data['ids'])->update([
-                'issue_date' => $data['issue_date'],
-                'issue_id' => $data['issue_id'],
-                'issue_typ' => 'Issued',
-            ]);
-        });
-
-        return back()->with('success', 'Tables dekama update una!');
-    }
+    return back()->with('success', 'Loan settled and Stock updated successfully!');
+}
     public function update(Request $request)
     {
         // 1. Validation with English comments
@@ -114,43 +139,39 @@ class IssuingLoanController extends Controller
         }
     }
 
-    public function delete($id)
-    {
-        try {
-            // 1. Find the issuing record first
-            $issuing = Issuing::findOrFail($id);
+public function delete($id)
+{
+    try {
+        $issuing = Issuing::findOrFail($id);
 
-            return DB::transaction(function () use ($issuing) {
-                // 2. Find the item and lock it for update
-                $item = Item::where('itm_code', $issuing->itm_code)->lockForUpdate()->first();
+        return DB::transaction(function () use ($issuing) {
+            $item = Item::where('itm_code', $issuing->itm_code)->lockForUpdate()->first();
 
-                if ($item) {
-                    // Precision calculation using floatval
-                    $qtyToRestore = floatval($issuing->itm_qty);
+            if ($item) {
+                $qtyToRestore = floatval($issuing->itm_qty);
 
-                    // --- STOCK REVERSAL LOGIC ---
-                    // We must update the Book Stock, not just the physical stock field
-                    $item->itm_book_stock = floatval($item->itm_book_stock) + $qtyToRestore;
+                // --- LOAN DELETE LOGIC ---
 
-                    // Re-calculate the Physical Stock based on your business logic
-                    // Physical Stock = Book Stock - Loan Stock
-                    $loanStock = floatval($item->itm_loan_stock ?? 0);
-                    $item->itm_stock = $item->itm_book_stock - $loanStock;
+                // 1. 
+                $item->itm_loan_stock = floatval($item->itm_loan_stock ?? 0) - $qtyToRestore;
 
-                    $item->save();
-                }
+                // 2. Book Stock 
 
-                // 3. Delete the linked record in Issuingloan table
-                Issuingloan::where('issue_table_id', $issuing->id)->delete();
+                // 3. Physical Stock re-calculate.
+                // Physical = Book Stock - Loan Stock
+                $item->itm_stock = floatval($item->itm_book_stock) - $item->itm_loan_stock;
 
-                // 4. Delete the main record in Issuing table
-                $issuing->delete();
+                $item->save();
+            }
 
-                return back()->with('success', 'Record deleted and stock updated successfully!');
-            });
-        } catch (\Exception $e) {
-            // Handle any errors that occur during the transaction
-            return back()->with('error', 'Error: ' . $e->getMessage());
-        }
+            // 3. Delete records
+            Issuingloan::where('issue_table_id', $issuing->id)->delete();
+            $issuing->delete();
+
+            return back()->with('success', 'Loan cancelled and Physical stock restored!');
+        });
+    } catch (\Exception $e) {
+        return back()->with('error', 'Error: ' . $e->getMessage());
     }
+}
 }
