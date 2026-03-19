@@ -2,211 +2,219 @@
 
 @section('content')
     <style>
-    /* ============================================================
-       Print Styles (A4 Portrait Layout)
-       ============================================================ */
-    @media print {
-        @page {
-            size: A4 portrait;
-            margin: 5mm 5mm 5mm 5mm !important; /* Top, Right, Bottom, Left */
+        /* ============================================================
+           Print Styles (A4 Portrait Layout)
+           ============================================================ */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 5mm 5mm 5mm 5mm !important;
+                /* Top, Right, Bottom, Left */
+            }
+
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .table-responsive {
+                overflow: visible !important;
+            }
+
+            .container-fluid,
+            .row,
+            .card,
+            .card-body {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                padding-top: 0 !important;
+                color: #000 !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                table-layout: auto !important;
+            }
+
+            th {
+                background-color: #f2f2f2 !important;
+                border: 1px solid black !important;
+                color: #000 !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                text-align: center;
+            }
+
+            td {
+                border: 1px solid black !important;
+                padding: 5px !important;
+                font-size: 11px !important;
+                color: black !important;
+                word-wrap: break-word;
+            }
+
+            .no-print,
+            .btn-group,
+            .btn,
+            .btn-custom {
+                display: none !important;
+            }
         }
 
-        body {
-            margin: 0 !important;
-            padding: 0 !important;
+
+        /* ============================================================
+           Screen View Styles
+           ============================================================ */
+
+        /* Sticky Container Fix */
+        @media screen {
+            .sticky-header-container {
+                position: -webkit-sticky;
+                position: sticky;
+                /* Dashboard eke top bar ekata wada yata thiyenna 70px wage danna */
+                top: 70px;
+                z-index: 1020;
+                background-color: #f4f7fa;
+                /* padding-top: 10px; */
+                /* padding-bottom: 10px; */
+            }
+
+            .sticky-header-container .card {
+                border: 1px solid #5d7186 !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+                background: #fff !important;
+            }
         }
 
-        .table-responsive {
-            overflow: visible !important;
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 1px;
+            /* Overwritten from 20px to match your specific setting */
+            text-align: left;
         }
 
-        .container-fluid,
-        .row,
-        .card,
-        .card-body {
-            display: block !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            padding-top: 0 !important;
-            color: #000 !important;
+        /* Table Styles */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
 
-        table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            table-layout: auto !important;
+        .report-table th,
+        .report-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
 
-        th {
-            background-color: #f2f2f2 !important;
-            border: 1px solid black !important;
-            color: #000 !important;
-            font-size: 11px !important;
-            font-weight: bold !important;
-            text-align: center;
+        .report-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
         }
 
-        td {
-            border: 1px solid black !important;
-            padding: 5px !important;
-            font-size: 11px !important;
-            color: black !important;
-            word-wrap: break-word;
-        }
-
-        .no-print,
-        .btn-group,
-        .btn,
+        /* Button Customization */
         .btn-custom {
-            display: none !important;
+            display: inline-flex;
+            /* Combined flex and inline-block logic */
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: rgb(255, 255, 255);
+            text-decoration: none;
         }
-    }
 
+        .btn-custom iconify-icon {
+            font-size: 20px;
+            line-height: 1;
+            display: block;
+        }
 
-    /* ============================================================
-       Screen View Styles
-       ============================================================ */
+        .report-main-card {
+            position: relative;
+            z-index: 1;
+            margin-top: 5px;
+        }
 
-           /* Sticky Container Fix */
-@media screen {
-    .sticky-header-container {
-        position: -webkit-sticky;
-        position: sticky;
-        /* Dashboard eke top bar ekata wada yata thiyenna 70px wage danna */
-        top: 70px; 
-        z-index: 1020; 
-        background-color: #f4f7fa; 
-        /* padding-top: 10px; */
-        /* padding-bottom: 10px; */
-    }
+        /* Layout Adjustments */
+        .container-fluid>.card.no-print {
+            margin-bottom: 10px !important;
+        }
 
-    .sticky-header-container .card {
-        border: 1px solid #5d7186 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-        background: #fff !important; 
-    }
-}
-    .btn-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 1px; /* Overwritten from 20px to match your specific setting */
-        text-align: left;
-    }
+        .container-fluid>.card:not(.no-print) {
+            margin-top: 0 !important;
+        }
 
-    /* Table Styles */
-    .report-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+        .card-body {
+            padding: 1rem !important;
+        }
 
-    .report-table th,
-    .report-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
+        .card {
+            width: 100% !important;
+            border: none !important;
+            border-radius: 15px !important;
+            box-shadow: none !important;
+        }
 
-    .report-table th {
-        background-color: #f8f9fa;
-        font-weight: bold;
-    }
+        /* Hover effects */
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            /* Click karanna kalin poddak uda yanawa */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.1);
+        }
 
-    /* Button Customization */
-    .btn-custom {
-        display: inline-flex; /* Combined flex and inline-block logic */
-        align-items: center;
-        justify-content: center;
-        width: 45px;
-        height: 45px;
-        padding: 8px 15px;
-        border-radius: 5px;
-        color: rgb(255, 255, 255);
-        text-decoration: none;
-    }
+        /* Specific Colors */
+        .btn-word {
+            background: linear-gradient(135deg, #1b64d1 0%, #39a9dc 100%);
+            /* Word Blue */
+        }
 
-    .btn-custom iconify-icon {
-        font-size: 20px;
-        line-height: 1;
-        display: block;
-    }
+        .btn-excel {
+            background: linear-gradient(135deg, #23a15c 0%, #0de982 100%);
+            /* Excel Green */
+        }
 
-    .report-main-card {
-        position: relative;
-        z-index: 1;
-        margin-top: 5px;
-    }
-
-    /* Layout Adjustments */
-    .container-fluid > .card.no-print {
-        margin-bottom: 10px !important;
-    }
-
-    .container-fluid > .card:not(.no-print) {
-        margin-top: 0 !important;
-    }
-
-    .card-body {
-        padding: 1rem !important;
-    }
-
-    .card {
-        width: 100% !important;
-        border: none !important;
-        border-radius: 15px !important;
-        box-shadow: none !important;
-    }
-    /* Hover effects */
-.btn-custom:hover {
-    transform: translateY(-2px); /* Click karanna kalin poddak uda yanawa */
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    filter: brightness(1.1);
-}
-
-/* Specific Colors */
-.btn-word {
-    background: linear-gradient(135deg, #1b64d1 0%, #39a9dc 100%); /* Word Blue */
-}
-
-.btn-excel {
-    background: linear-gradient(135deg, #23a15c 0%, #0de982 100%); /* Excel Green */
-}
-
-.btn-print {
-    background: linear-gradient(135deg, #4b4b4b 0%, #7d7d7d 100%); /* Professional Gray */
-}
-
-</style>
+        .btn-print {
+            background: linear-gradient(135deg, #4b4b4b 0%, #7d7d7d 100%);
+            /* Professional Gray */
+        }
+    </style>
 
     <div class="container-fluid">
         <div class="sticky-header-container no-print">
-        <div class="card">
-            <div class="card-body p-2">
-                <div class="row align-items-center">
-                    <div class="col-12 text-end">
-                        <div class="btn-group justify-content-end w-100">
+            <div class="card">
+                <div class="card-body p-2">
+                    <div class="row align-items-center">
+                        <div class="col-12 text-end">
+                            <div class="btn-group justify-content-end w-100">
 
-                            <a href="{{ url('/items-export?type=word') }}"
-                                class="btn-custom btn-word d-flex align-items-center">
-                                <iconify-icon icon="fa6-solid:file-word"></iconify-icon>
-                            </a>
+                                <a href="{{ url('/items-export?type=word') }}"
+                                    class="btn-custom btn-word d-flex align-items-center">
+                                    <iconify-icon icon="fa6-solid:file-word"></iconify-icon>
+                                </a>
 
-                            <a href="{{ url('/items-export?type=excel') }}"
-                                class="btn-custom btn-excel d-flex align-items-center">
-                                <iconify-icon icon="fa6-solid:file-excel"></iconify-icon>
-                            </a>
+                                <a href="{{ url('/items-export?type=excel') }}"
+                                    class="btn-custom btn-excel d-flex align-items-center">
+                                    <iconify-icon icon="fa6-solid:file-excel"></iconify-icon>
+                                </a>
 
-                            <a href="javascript:window.print()" class="btn-custom btn-print d-flex align-items-center">
-                                <iconify-icon icon="fa6-solid:print"></iconify-icon>
-                            </a>
+                                <a href="javascript:window.print()" class="btn-custom btn-print d-flex align-items-center">
+                                    <iconify-icon icon="fa6-solid:print"></iconify-icon>
+                                </a>
 
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-</div>
         </div>
 
         <div class="card">
@@ -264,21 +272,22 @@
                                                     <strong>{{ $item->itm_name }}</strong>
                                                 </td>
                                                 <!-- <td>
-                                                    <small class="text-muted">{{ $item->itm_sinhalaname }}</small>
-                                                </td> -->
+                                                        <small class="text-muted">{{ $item->itm_sinhalaname }}</small>
+                                                    </td> -->
                                                 <!-- <td>{{ $item->itm_group }}</td> -->
                                                 <td style="text-align: center;">{{ $item->itm_unit_of_measure }}</td>
                                                 <td style="text-align: center;">
-                                                    <span style="font-weight: bold; color: {{ $item->itm_reorder_flag == 'Yes' ? ($item->itm_stock <= $item->itm_reorder_level ? 'red' : 'green') : 'black' }};">
+                                                    <span
+                                                        style="font-weight: bold; color: {{ $item->itm_reorder_flag == 'Yes' ? ($item->itm_stock <= $item->itm_reorder_level ? 'red' : 'green') : 'black' }};">
                                                         {{ $item->itm_stock }}
                                                     </span>
                                                 </td>
                                                 <!-- <td style="text-align: center;">{{ $item->itm_reorder_level }}</td> -->
                                                 <!-- <td style="text-align: center;">
-                                                    <span class="badge" style="color: {{ $item->itm_status == 'ordered' ? '#2ecc71' : '#e74c3c' }}; font-weight: bold;">
-                                                        {{ $item->itm_status == 'ordered' ? 'ORDERED' : 'NOT ORDERED' }}
-                                                    </span>
-                                                </td> -->
+                                                        <span class="badge" style="color: {{ $item->itm_status == 'ordered' ? '#2ecc71' : '#e74c3c' }}; font-weight: bold;">
+                                                            {{ $item->itm_status == 'ordered' ? 'ORDERED' : 'NOT ORDERED' }}
+                                                        </span>
+                                                    </td> -->
                                             </tr>
                                         @endforeach
                                     @endforeach
@@ -300,7 +309,7 @@
     </div>
 @endsection
 
-<!-- <tbody>
+{{-- <!-- <tbody>
                                     @foreach ($items as $index => $item)
                                         <tr>
                                             <td style="text-align: center;">{{ $index + 1 }}</td>
@@ -326,4 +335,4 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                </tbody>  -->
+                                </tbody>  --> --}}

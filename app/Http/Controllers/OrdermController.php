@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+// use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Ordertemp;
 use App\Models\Orderm;
 use App\Models\Item;
@@ -297,4 +298,33 @@ class OrdermController extends Controller
 
         return redirect()->back()->with('success', 'Reorder successfully Loaded');
     }
+
+    public function export(Request $request)
+{
+    $type = $request->query('type');
+    $orderId = $request->query('order_id'); // URL එකෙන් එන ID එක ගන්නවා
+
+    // Order එකට අදාළ data ටික database එකෙන් ගන්න
+    $orderDetails = Orderm::with('item')->where('order_id', $orderId)->get();
+
+    if ($orderDetails->isEmpty()) {
+        return redirect()->back()->with('error', 'No records found to export.');
+    }
+
+    // View එකට යවන්න ඕන data ටික
+    // වැදගත්: Blade එකේ පාවිච්චි කරන්නේ $order_id නිසා මෙතනත් ඒ නමම පාවිච්චි කරන්න
+    $data = [
+        'orderDetails' => $orderDetails,
+        'order_id'     => $orderId, // මෙතන නම හරියටම බලන්න
+        'orderDate'    => $orderDetails->first()->order_date
+    ];
+
+    if ($type == 'word') {
+        return response()->view('reports.order_word_export', $data)
+            ->header('Content-Type', 'application/msword; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename=Order_Report_' . str_replace('/', '_', $orderId) . '.doc');
+    }
+
+    return redirect()->back()->with('error', 'Invalid export type.');
+}
 }

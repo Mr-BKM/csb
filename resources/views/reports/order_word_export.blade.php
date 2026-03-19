@@ -1,87 +1,50 @@
-@extends('layouts.orderprint')
-<!-- Start right Content here -->
-<!-- ==================================================== -->
-@section('content')
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Order Report - {{ $order_id }}</title>
     <style>
-        @media print {
-            @page {
-                size: A4;
-                /*(Top, Right, Bottom, Left)*/
-                margin: 7mm 5mm 5mm 15mm;
-            }
+        body {
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
 
-            /* Content eka madi hariyen kedenna dena eka nawaththanna */
-            .container-fluid,
-            .row,
-            .card,
-            .card-body {
-                color: #000000 !important;
-                page-break-inside: avoid !important;
-                display: block !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
+        .text-center {
+            text-align: center;
+        }
 
-            /* Table eka lassanata fit karanna */
-            table {
-                color: #000000 !important;
-                width: 100% !important;
-                border-collapse: collapse !important;
-                table-layout: auto !important;
-                page-break-inside: auto;
-                margin-bottom: 15px !important;
-            }
+        .header-section {
+            margin-bottom: 20px;
+        }
 
-            th {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-                border: 1px solid black !important;
-                font-size: 15px !important;
-                color: #000000 !important;
-                font-weight: 800 !important;
-                text-align: center;
-                -webkit-print-color-adjust: exact;
-            }
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
 
-            td {
-                border: 1px solid black !important;
-                padding: 8px !important;
-                font-size: 13px !important;
-                color: black !important;
-                white-space: normal !important;
-                word-wrap: break-word !important;
-            }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
 
-            tr {
-                color: #000000 !important;
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            /* Space control */
-            .mt-3,
-            .mt-5 {
-                margin-top: 10px !important;
-            }
-
-            .mb-1,
-            .mb-2 {
-                margin-bottom: 5px !important;
-            }
-
-            /* Blank spaces control */
-            br {
-                content: "";
-                display: block;
-                margin: 5px 0;
-            }
-
-            .d-print-none,
-            .btn {
-                display: none !important;
-            }
+        .footer-section {
+            margin-top: 40px;
         }
     </style>
-    <!-- Start Container Fluid -->
+</head>
+
+<body>
+
     <title>Order - {{ $order_id }} - {{ $orderDate }}</title>
 
     <div class="container-fluid">
@@ -142,7 +105,8 @@
                                                 <tr>
                                                     <td style="text-align: center;">
                                                         {{ $index + 1 }}</td>
-                                                    <td>{{ $orderm->item->itm_name ?? ($orderm->itm_name ?? 'N/A') }} <br>
+                                                    <td>{{ $orderm->item->itm_name ?? ($orderm->itm_name ?? 'N/A') }}
+                                                        <br>
                                                         ({{ $orderm->item->itm_sinhalaname ?? ($orderm->itm_sinhalaname ?? 'N/A') }})
                                                         - <strong>({{ $orderm->cus_name }})</strong>
                                                     </td>
@@ -186,21 +150,13 @@
                                 </div>
                             </div>
                         </div> <!-- end row -->
-
-                        <div class="mt-5 mb-1">
-                            <div class="text-end d-print-none">
-                                <a href="javascript:window.print()" class="btn btn-primary">Print</a>
-                                <a href="{{ route('orderm.export', ['type' => 'word', 'order_id' => $order_id]) }}"
-                                    class="btn-custom btn-word d-flex align-items-center">
-                                    <iconify-icon icon="fa6-solid:file-word"></iconify-icon> Word Export
-                                </a>
-                            </div>
-                        </div>
-
                     </div> <!-- end card body -->
                 </div> <!-- end card -->
             </div> <!-- end col -->
         </div> <!-- end row -->
 
     </div>
-@endsection
+
+</body>
+
+</html>
