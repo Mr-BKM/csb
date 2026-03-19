@@ -63,9 +63,30 @@
         }
     }
 
+
     /* ============================================================
        Screen View Styles
        ============================================================ */
+
+           /* Sticky Container Fix */
+@media screen {
+    .sticky-header-container {
+        position: -webkit-sticky;
+        position: sticky;
+        /* Dashboard eke top bar ekata wada yata thiyenna 70px wage danna */
+        top: 70px; 
+        z-index: 1020; 
+        background-color: #f4f7fa; 
+        /* padding-top: 10px; */
+        /* padding-bottom: 10px; */
+    }
+
+    .sticky-header-container .card {
+        border: 1px solid #5d7186 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        background: #fff !important; 
+    }
+}
     .btn-group {
         display: flex;
         flex-wrap: wrap;
@@ -112,11 +133,10 @@
         display: block;
     }
 
-    /* Button Colors */
-    .btn-pdf,
-    .btn-word,
-    .btn-print {
-        background-color: #5d7186;
+    .report-main-card {
+        position: relative;
+        z-index: 1;
+        margin-top: 5px;
     }
 
     /* Layout Adjustments */
@@ -138,23 +158,44 @@
         border-radius: 15px !important;
         box-shadow: none !important;
     }
+    /* Hover effects */
+.btn-custom:hover {
+    transform: translateY(-2px); /* Click karanna kalin poddak uda yanawa */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    filter: brightness(1.1);
+}
+
+/* Specific Colors */
+.btn-word {
+    background: linear-gradient(135deg, #1b64d1 0%, #39a9dc 100%); /* Word Blue */
+}
+
+.btn-excel {
+    background: linear-gradient(135deg, #23a15c 0%, #0de982 100%); /* Excel Green */
+}
+
+.btn-print {
+    background: linear-gradient(135deg, #4b4b4b 0%, #7d7d7d 100%); /* Professional Gray */
+}
+
 </style>
 
     <div class="container-fluid">
-        <div class="card no-print">
+        <div class="sticky-header-container no-print">
+        <div class="card">
             <div class="card-body p-2">
                 <div class="row align-items-center">
                     <div class="col-12 text-end">
                         <div class="btn-group justify-content-end w-100">
 
-                            <a href="{{ url('/items-export?type=pdf') }}"
-                                class="btn-custom btn-pdf d-flex align-items-center">
-                                <iconify-icon icon="fa6-solid:file-pdf"></iconify-icon>
-                            </a>
-
                             <a href="{{ url('/items-export?type=word') }}"
                                 class="btn-custom btn-word d-flex align-items-center">
                                 <iconify-icon icon="fa6-solid:file-word"></iconify-icon>
+                            </a>
+
+                            <a href="{{ url('/items-export?type=excel') }}"
+                                class="btn-custom btn-excel d-flex align-items-center">
+                                <iconify-icon icon="fa6-solid:file-excel"></iconify-icon>
                             </a>
 
                             <a href="javascript:window.print()" class="btn-custom btn-print d-flex align-items-center">
@@ -165,6 +206,7 @@
                     </div>
                 </div>
             </div>
+</div>
         </div>
 
         <div class="card">
@@ -190,12 +232,12 @@
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Code</th>
                                         <th>Item Name</th>
-                                        <th>Item Name Sinhala</th>
+                                        <!-- <th>Item Name Sinhala</th> -->
                                         <!-- <th>Group</th> -->
                                         <th style="text-align: center;">Unit</th>
                                         <th style="text-align: center;">Stock</th>
-                                        <th style="text-align: center;">Reorder Level</th>
-                                        <th style="text-align: center;">Status</th>
+                                        <!-- <th style="text-align: center;">Reorder Level</th> -->
+                                        <!-- <th style="text-align: center;">Status</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -219,11 +261,11 @@
 
                                                 <td style="text-align: center;">{{ $item->itm_code }}</td>
                                                 <td>
-                                                    <strong>{{ $item->itm_name }}</strong><br>
+                                                    <strong>{{ $item->itm_name }}</strong>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <small class="text-muted">{{ $item->itm_sinhalaname }}</small>
-                                                </td>
+                                                </td> -->
                                                 <!-- <td>{{ $item->itm_group }}</td> -->
                                                 <td style="text-align: center;">{{ $item->itm_unit_of_measure }}</td>
                                                 <td style="text-align: center;">
@@ -231,14 +273,12 @@
                                                         {{ $item->itm_stock }}
                                                     </span>
                                                 </td>
-                                                <td style="text-align: center;">{{ $item->itm_reorder_level }}</td>
-                                                <td style="text-align: center;"> <span class="badge"
-          style="color: {{ $item->itm_status == 'ordered' ? '#2ecc71' : '#e74c3c' }}; font-weight: bold;">
-        
-        {{ $item->itm_status == 'ordered' ? 'ORDERED' : 'NOT ORDERED' }}
-        
-    </span>
-</td>
+                                                <!-- <td style="text-align: center;">{{ $item->itm_reorder_level }}</td> -->
+                                                <!-- <td style="text-align: center;">
+                                                    <span class="badge" style="color: {{ $item->itm_status == 'ordered' ? '#2ecc71' : '#e74c3c' }}; font-weight: bold;">
+                                                        {{ $item->itm_status == 'ordered' ? 'ORDERED' : 'NOT ORDERED' }}
+                                                    </span>
+                                                </td> -->
                                             </tr>
                                         @endforeach
                                     @endforeach
