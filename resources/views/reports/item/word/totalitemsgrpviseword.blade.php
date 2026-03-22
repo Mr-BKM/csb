@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Item Stock Report</title>
@@ -10,36 +11,48 @@
             color: #333;
             line-height: 1.4;
         }
-        .text-center { text-align: center; }
-        .header-section { margin-bottom: 20px; }
-        
+
+        .text-center {
+            text-align: center;
+        }
+
+        .header-section {
+            margin-bottom: 20px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #000;
             padding: 6px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
             font-weight: bold;
         }
+
         .category-row {
             background-color: #f8f9fa;
             font-weight: bold;
         }
+
         .footer-section {
             margin-top: 50px;
         }
     </style>
 </head>
+
 <body>
 
     <div class="header-section text-center">
-        <h2 style="margin-bottom: 5px;"><u>Item Stock Report</u></h2>
+        <h2 style="margin-bottom: 5px;"><u>Group Vise Item Stock Report</u></h2>
         <p style="margin: 0; font-size: 13px;">පාරිභෝජ්‍ය ගබඩාව - B | ශික්ෂණ රෝහල, අනුරාධපුර</p>
         <p style="margin: 5px 0; font-size: 10px;">Generated on: {{ date('Y-m-d H:i A') }}</p>
     </div>
@@ -79,4 +92,5 @@
     </div>
 
 </body>
+
 </html>

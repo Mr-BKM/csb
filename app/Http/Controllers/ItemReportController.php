@@ -2,62 +2,102 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
 use App\Models\Item;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Issuing;
+use Carbon\Carbon;
+use DB;
 
 class ItemReportController extends Controller
 {
-    public function showdata()
+    public function showData(Request $request)
     {
-        // $items = Item::all();
-        $groupedItems = Item::all()->groupBy('itm_group');
-        return view('reports.itemsreport', compact('groupedItems'));
-        // compact('items') kiyana eka aniwaren danna ona data tika blade ekata yawanna
-        // return view('reports.itemsreport', compact('items'));
+        $reportType = $request->input('report_type');
+        $selectedGroup = $request->input('group_id');
+        $groups = Group::orderBy('grp_name', 'asc')->get();
+        $query = Item::orderBy('itm_code', 'asc');
+
+        if ($selectedGroup) {
+            $query->where('itm_group', $selectedGroup);
+        }
+
+        // --- 1. Buffer Stock Report එක නම් Forecast logic එක call කරනවා ---
+        if ($reportType == 'I_B_S_Report') {
+            $this->runAutoForecasting(); // මෙතනදී තමයි වෙනම තියෙන function එක call කරන්නේ
+
+            $items = $query->get();
+            return view('reports.item.report.itembufferstock', compact('items', 'groups'));
+        }
+
+        // --- 2. Group Wise Report ---
+        if ($reportType == 'G_V_I_S_Report') {
+            $groupedItems = $query->get()->groupBy('itm_group');
+            return view('reports.item.report.totalitemsgrpvise', compact('groupedItems', 'groups'));
+        }
+
+        // --- 3. Default View ---
+        $items = $query->get();
+        return view('reports.item.report.totalitems', compact('items', 'groups'));
     }
 
-  public function export(Request $request)
+    public function export(Request $request)
     {
         ini_set('max_execution_time', 300);
         ini_set('memory_limit', '512M');
 
-        // Data optimization: Ona tika vitharak gannawa
-        $groupedItems = Item::select(['itm_code', 'itm_name', 'itm_group', 'itm_unit_of_measure', 'itm_stock', 'itm_reorder_flag', 'itm_reorder_level'])
-                            ->get()
-                            ->groupBy('itm_group');
-        
-        $type = $request->input('type', 'excel');
+        $reportType = $request->input('report_type');
+        $exportType = $request->input('type', 'excel');
 
-        // --- CSV / Excel Export ---
-        if ($type == 'excel') {
-            $fileName = 'items_report_' . date('Ymd') . '.csv';
+        $query = Item::orderBy('itm_code', 'asc');
+
+        // --- 1. CSV / Excel Export ---
+        if ($exportType == 'excel') {
+            $fileName = ($reportType == 'G_V_I_S_Report' ? 'group_wise_items_' : 'all_items_') . date('Ymd') . '.csv';
+
             $headers = [
-                "Content-type"        => "text/csv; charset=UTF-8",
-                "Content-Disposition" => "attachment; filename=$fileName",
-                "Pragma"              => "no-cache",
-                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-                "Expires"             => "0"
+                'Content-type' => 'text/csv; charset=UTF-8',
+                'Content-Disposition' => "attachment; filename=$fileName",
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
             ];
 
-            $columns = ['#', 'Code', 'Item Name', 'Category', 'Unit', 'Stock'];
+            // Report Type එක අනුව Columns වෙනස් කරමු
+            if ($reportType == 'G_V_I_S_Report') {
+                $columns = ['#', 'Group/Category', 'Item Code', 'Item Name', 'Unit', 'Current Stock'];
+            } else {
+                $columns = ['#', 'Item Code', 'Item Name', 'Unit', 'Current Stock'];
+            }
 
-            $callback = function() use($groupedItems, $columns) {
+            $callback = function () use ($query, $columns, $reportType) {
                 $file = fopen('php://output', 'w');
-                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM for Excel Sinhala support
+                fprintf($file, chr(0xef) . chr(0xbb) . chr(0xbf)); // Sinhala support
                 fputcsv($file, $columns);
 
                 $serial = 1;
-                foreach ($groupedItems as $groupName => $items) {
+
+                if ($reportType == 'G_V_I_S_Report') {
+                    // Group කරපු data Excel එකට දාන විදිහ
+                    $groupedData = $query->get()->groupBy('itm_group');
+                    foreach ($groupedData as $groupName => $items) {
+                        foreach ($items as $item) {
+                            fputcsv($file, [$serial++, $groupName ?: 'Not Assigned', $item->itm_code, $item->itm_name, $item->itm_unit_of_measure, $item->itm_stock]);
+                        }
+                    }
+                } elseif ($reportType == 'I_B_S_Report') {
+                    // Group කරපු data Excel එකට දාන විදිහ
+                    $groupedData = $query->get()->groupBy('itm_group');
+                    foreach ($groupedData as $groupName => $items) {
+                        foreach ($items as $item) {
+                            fputcsv($file, [$serial++, $groupName ?: 'Not Assigned', $item->itm_code, $item->itm_name, $item->itm_unit_of_measure, $item->itm_stock]);
+                        }
+                    }
+                } else {
+                    // Normal list එක Excel එකට දාන විදිහ
+                    $items = $query->get();
                     foreach ($items as $item) {
-                        fputcsv($file, [
-                            $serial++,
-                            $item->itm_code,
-                            $item->itm_name,
-                            $groupName ?: 'Other',
-                            $item->itm_unit_of_measure,
-                            $item->itm_stock
-                        ]);
+                        fputcsv($file, [$serial++, $item->itm_code, $item->itm_name, $item->itm_unit_of_measure, $item->itm_stock]);
                     }
                 }
                 fclose($file);
@@ -65,72 +105,53 @@ class ItemReportController extends Controller
             return response()->stream($callback, 200, $headers);
         }
 
-        // --- Word Export ---
-        if ($type == 'word') {
-            return response()->view('reports.items_report_pdf', compact('groupedItems'))
-                ->header('Content-Type', 'application/msword; charset=utf-8')
-                ->header('Content-Disposition', 'attachment; filename=items_report_' . date('Ymd') . '.doc');
-        }
+        // --- 2. Word Export ---
+        if ($exportType == 'word') {
+            $date = date('Y-m-d H:i A');
+            if ($reportType == 'G_V_I_S_Report') {
+                $groupedItems = $query->get()->groupBy('itm_group');
+                return response()->view('reports.item.word.totalitemsgrpviseword', compact('groupedItems', 'date'))->header('Content-Type', 'application/msword')->header('Content-Disposition', 'attachment; filename=group_items_report.doc');
+            }
 
-        // --- PDF Export (The missing part) ---
-        if ($type == 'pdf') {
-            // View eka load karala A4 portrait hadanawa
-            $pdf = Pdf::loadView('reports.items_report_pdf', compact('groupedItems'))
-                      ->setPaper('a4', 'portrait');
-            
-            return $pdf->download('items_report_' . date('Ymd') . '.pdf');
+            $items = $query->get();
+            return response()->view('reports.item.word.totalitemsword', compact('items', 'date'))->header('Content-Type', 'application/msword')->header('Content-Disposition', 'attachment; filename=all_items_report.doc');
         }
-
-        return redirect()->back()->with('error', 'Invalid export type.');
     }
 
-//     public function export(Request $request)
-// {
-//     ini_set('max_execution_time', 300);
-//     ini_set('memory_limit', '512M');
+    private function runAutoForecasting()
+    {
+        // 1. මේ වසරේ අද දක්වා ගතවූ දින ගණන (උදා: පෙබ 28 = 59)
+        $daysPassed = Carbon::now()->dayOfYear;
 
-//     // Meka mehema wenas karanna
-//     $groupedItems = Item::all()->groupBy('itm_group'); 
-//     $type = $request->input('type');
+        // 2. Reorder condition එකට ගැලපෙන items ටික ගන්නවා
 
-//     if ($type == 'pdf') {
-//         // 'compact' ekata 'groupedItems' danna
-//         $pdf = Pdf::loadView('reports.itemsreport', compact('groupedItems'))->setPaper('a4', 'landscape');
+        $items = Item::where('itm_reorder_flag', 'Yes')->where('itm_status', 'active')->whereColumn('itm_reorder_level', '>=', 'itm_stock')->get();
 
-//         return $pdf->stream('items_report.pdf');
-//     }
+        if ($items->isEmpty()) {
+            return;
+        }
 
-//     // Word ekatath e widiyatama danna
-//     if ($type == 'word') {
-//         $headers = [
-//             'Content-type' => 'application/vnd.ms-word',
-//             'Content-Disposition' => 'attachment;Filename=items_report.doc',
-//         ];
-//         return response()->view('reports.itemsreport', compact('groupedItems'), 200, $headers);
-//     }
-// }
+        DB::beginTransaction();
+        try {
+            foreach ($items as $item) {
+                // 3. මේ වසරේදී අදාළ අයිතමය නිකුත් කර ඇති මුළු ප්‍රමාණය (Usage)
+                $totalIssuedQty = Issuing::where('itm_code', $item->itm_code)->whereYear('issue_date', date('Y'))->sum('itm_qty');
 
-    // public function export(Request $request)
-    // {
-    //     ini_set('max_execution_time', 300); // Seconds 300 (Minutes 5)
-    //     ini_set('memory_limit', '512M');
+                // 4. FORECAST CALCULATION: (Actual Usage / Days Gone) * 365
+                $forecastedQty = $daysPassed > 0 ? ($totalIssuedQty / $daysPassed) * 120 : 0;
+                $finalOrderQty = round($forecastedQty);
 
-    //     $items = Item::all();
-    //     $type = $request->input('type');
-
-    //     if ($type == 'pdf') {
-    //         // Methana 'pages.itemsreport' kiyana eka file name ekatama match wenna ona
-    //         $pdf = Pdf::loadView('reports.itemsreport', compact('items'))->setPaper('a4', 'landscape');
-
-    //         return $pdf->stream('items_report.pdf');
-    //     }
-
-    //     if ($type == 'word') {
-    //         $headers = [
-    //             'Content-type' => 'application/vnd.ms-word',
-    //             'Content-Disposition' => 'attachment;Filename=items_report.doc',
-    //         ];
-    //         return response()->view('reports.itemsreport', compact('items'), 200, $headers);
-    //     }
-    // }
+                // 5. වැදගත්ම කොටස: ගණනය කරපු අගය Item table එකේ reorder level එකට save කරනවා
+                if ($finalOrderQty > 0) {
+                    $item->update([
+                        'itm_reorder_level' => $finalOrderQty,
+                    ]);
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Item Reorder Level Update Error: ' . $e->getMessage());
+        }
+    }
 }

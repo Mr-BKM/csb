@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* ============================================================
-                                               Print Styles (A4 Portrait Layout)
-                                               ============================================================ */
+                                                                                                                                                               Print Styles (A4 Portrait Layout)
+                                                                                                                                                               ============================================================ */
         @media print {
             @page {
                 size: A4 portrait;
@@ -66,8 +66,8 @@
 
 
         /* ============================================================
-                                               Screen View Styles
-                                               ============================================================ */
+                                                                                                                                                               Screen View Styles
+                                                                                                                                                               ============================================================ */
 
         /* Sticky Container Fix */
         @media screen {
@@ -195,24 +195,26 @@
                     <div class="row align-items-center">
 
                         <div class="col-md-9">
-                            <form action="{{ url('/items-export') }}" method="GET" id="reportForm"
+                            {{-- <form action="{{ url('/items-report') }}" method="GET" id="reportForm"
+                                class="d-flex align-items-center gap-2"> --}}
+
+                            <form action="{{ route('itemsreport.showData') }}" method="GET" id="reportForm"
                                 class="d-flex align-items-center gap-2">
                                 <div style="min-width: 350px;">
                                     <select class="form-control" data-choices name="report_type"
                                         id="choices-single-default">
-                                        <option value="">Select Report Type</option>
-                                        <option value="total_stock"
-                                            {{ request('report_type') == 'total_stock' ? 'selected' : '' }}>1. Total Stock
-                                            Report</option>
-                                        <option value="price_detail"
-                                            {{ request('report_type') == 'price_detail' ? 'selected' : '' }}>2. Item Price
-                                            Detail Report</option>
-                                        <option value="item_detail"
-                                            {{ request('report_type') == 'item_detail' ? 'selected' : '' }}>3. Item Detail
-                                            Report</option>
-                                        <option value="reorder_level"
-                                            {{ request('report_type') == 'reorder_level' ? 'selected' : '' }}>4. Item
-                                            Reorder Level Report</option>
+                                        <option value="C_I_S_Report"
+                                            {{ request('report_type') == 'C_I_S_Report' || !request('report_type') ? 'selected' : '' }}>
+                                            1. Current Item Stock Report
+                                        </option>
+                                        <option value="G_V_I_S_Report"
+                                            {{ request('report_type') == 'G_V_I_S_Report' ? 'selected' : '' }}>
+                                            2. Group Vise Item Stock Report
+                                        </option>
+                                        <option value="I_B_S_Report"
+                                            {{ request('report_type') == 'I_B_S_Report' ? 'selected' : '' }}>
+                                            3. Item Buffer Stock Report
+                                        </option>
                                     </select>
                                 </div>
 
@@ -252,7 +254,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12 text-center">
-                        <h3 class="mb-0"><strong><u>Item Stock Report</u></strong></h3>
+                        <h3 class="mb-0"><strong><u>Current Item Stock Report</u></strong></h3>
                         <div style="line-height: 1.2; margin-top: 5px;">
                             <p class="mb-0" style="font-size: 14px;">පාරිභෝජ්‍ය ගබඩාව - B | ශික්ෂණ රෝහල, අනුරාධපුර</p>
                             <small class="text-muted" style="font-size: 12px; font-weight: bold;">
@@ -271,56 +273,29 @@
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Code</th>
                                         <th>Item Name</th>
-                                        <!-- <th>Item Name Sinhala</th> -->
-                                        <!-- <th>Group</th> -->
                                         <th style="text-align: center;">Unit</th>
                                         <th style="text-align: center;">Stock</th>
-                                        <!-- <th style="text-align: center;">Reorder Level</th> -->
-                                        <!-- <th style="text-align: center;">Status</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $serialNumber = 1; @endphp
-
-                                    @foreach ($groupedItems as $groupName => $items)
-                                        <tr style="background-color: #f1f3f5;">
-                                            <td colspan="8" style="padding: 10px; border: 1px solid black;">
-                                                <h6 class="mb-0" style="font-weight: bold; color: #495057;">
-                                                    <iconify-icon icon="solar:folder-with-files-bold-duotone"
-                                                        class="me-2"></iconify-icon>
-                                                    Category: {{ $groupName ?: 'Other Items' }}
-                                                </h6>
+                                    @foreach ($items as $index => $item)
+                                        <tr>
+                                            <td style="text-align: center;">{{ $index + 1 }}</td>
+                                            <td style="text-align: center;">{{ $item->itm_code }}</td>
+                                            <td>
+                                                <strong>{{ $item->itm_name }}</strong>
+                                                @if ($item->itm_sinhalaname)
+                                                    - <strong>{{ $item->itm_sinhalaname }}</strong>
+                                                @endif
+                                            </td>
+                                            <td style="text-align: center;">{{ $item->itm_unit_of_measure }}</td>
+                                            <td style="text-align: center;">
+                                                <span
+                                                    style="{{ $item->itm_stock <= $item->itm_reorder_level ? 'color: red; font-weight: bold;' : 'color: green; font-weight: bold;' }}">
+                                                    {{ $item->itm_stock }}
+                                                </span>
                                             </td>
                                         </tr>
-
-                                        @foreach ($items as $item)
-                                            <tr>
-                                                <td style="text-align: center; font-weight: bold;">{{ $serialNumber++ }}
-                                                </td>
-
-                                                <td style="text-align: center;">{{ $item->itm_code }}</td>
-                                                <td>
-                                                    <strong>{{ $item->itm_name }}</strong>
-                                                </td>
-                                                <!-- <td>
-                                                                                            <small class="text-muted">{{ $item->itm_sinhalaname }}</small>
-                                                                                        </td> -->
-                                                <!-- <td>{{ $item->itm_group }}</td> -->
-                                                <td style="text-align: center;">{{ $item->itm_unit_of_measure }}</td>
-                                                <td style="text-align: center;">
-                                                    <span
-                                                        style="font-weight: bold; color: {{ $item->itm_reorder_flag == 'Yes' ? ($item->itm_stock <= $item->itm_reorder_level ? 'red' : 'green') : 'black' }};">
-                                                        {{ $item->itm_stock }}
-                                                    </span>
-                                                </td>
-                                                <!-- <td style="text-align: center;">{{ $item->itm_reorder_level }}</td> -->
-                                                <!-- <td style="text-align: center;">
-                                                                                            <span class="badge" style="color: {{ $item->itm_status == 'ordered' ? '#2ecc71' : '#e74c3c' }}; font-weight: bold;">
-                                                                                                {{ $item->itm_status == 'ordered' ? 'ORDERED' : 'NOT ORDERED' }}
-                                                                                            </span>
-                                                                                        </td> -->
-                                            </tr>
-                                        @endforeach
                                     @endforeach
                                 </tbody>
                             </table>
@@ -339,31 +314,3 @@
         </div>
     </div>
 @endsection
-
-{{-- <!-- <tbody>
-                                    @foreach ($items as $index => $item)
-                                        <tr>
-                                            <td style="text-align: center;">{{ $index + 1 }}</td>
-                                            <td style="text-align: center;">{{ $item->itm_code }}</td>
-                                            <td>
-                                                <strong>{{ $item->itm_name }}</strong><br>
-                                                <small class="text-muted">{{ $item->itm_sinhalaname }}</small>
-                                            </td>
-                                            <td>{{ $item->itm_group }}</td>
-                                            <td style="text-align: center;">{{ $item->itm_unit_of_measure }}</td>
-                                            <td style="text-align: center;">
-                                                <span
-                                                    style="{{ $item->itm_stock <= $item->itm_reorder_level ? 'color: red; font-weight: bold;' : '' }}">
-                                                    {{ $item->itm_stock }}
-                                                </span>
-                                            </td>
-                                            <td style="text-align: center;">{{ $item->itm_reorder_level }}</td>
-                                            <td style="text-align: center;">
-                                                <span class="badge"
-                                                    style="background-color: {{ $item->itm_status == 'active' ? '#2ecc71' : '#e74c3c' }}; color: white; padding: 2px 5px; border-radius: 3px;">
-                                                    {{ strtoupper($item->itm_status) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>  --> --}}
