@@ -42,81 +42,123 @@ class ItemReportController extends Controller
     }
 
     public function export(Request $request)
-    {
-        ini_set('max_execution_time', 300);
-        ini_set('memory_limit', '512M');
+{
+    ini_set('max_execution_time', 300);
+    ini_set('memory_limit', '512M');
 
-        $reportType = $request->input('report_type');
-        $exportType = $request->input('type', 'excel');
+    $reportType = $request->input('report_type');
+    $exportType = $request->input('type', 'excel');
 
-        $query = Item::orderBy('itm_code', 'asc');
+    // Filter එකෙන් එන group id එකත් ගන්නවා
+    $selectedGroup = $request->input('group_id');
 
-        // --- 1. CSV / Excel Export ---
-        if ($exportType == 'excel') {
-            $fileName = ($reportType == 'G_V_I_S_Report' ? 'group_wise_items_' : 'all_items_') . date('Ymd') . '.csv';
+    $query = Item::orderBy('itm_code', 'asc');
 
-            $headers = [
-                'Content-type' => 'text/csv; charset=UTF-8',
-                'Content-Disposition' => "attachment; filename=$fileName",
-                'Pragma' => 'no-cache',
-                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                'Expires' => '0',
-            ];
+    // Group filter එකක් තියෙනවා නම් ඒක අදාළ කරගන්නවා
+    if ($selectedGroup) {
+        $query->where('itm_group', $selectedGroup);
+    }
 
-            // Report Type එක අනුව Columns වෙනස් කරමු
+    // --- 1. CSV / Excel Export ---
+    if ($exportType == 'excel') {
+        $fileName = ($reportType == 'I_B_S_Report' ? 'item_buffer_stock_' : ($reportType == 'G_V_I_S_Report' ? 'group_wise_items_' : 'all_items_')) . date('Ymd') . '.csv';
+
+        $headers = [
+            'Content-type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=$fileName",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        // Report Type එක අනුව Columns තීරණය කිරීම
+        if ($reportType == 'I_B_S_Report') {
+            $columns = ['#', 'Item Code', 'Item Name', 'Unit', 'Stock', 'Reorder Level', 'Status'];
+        } elseif ($reportType == 'G_V_I_S_Report') {
+            $columns = ['#', 'Group/Category', 'Item Code', 'Item Name', 'Unit', 'Current Stock'];
+        } else {
+            $columns = ['#', 'Item Code', 'Item Name', 'Unit', 'Current Stock'];
+        }
+
+        $callback = function () use ($query, $columns, $reportType) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xef) . chr(0xbb) . chr(0xbf)); // Sinhala support
+            fputcsv($file, $columns);
+
+            $serial = 1;
+
             if ($reportType == 'G_V_I_S_Report') {
-                $columns = ['#', 'Group/Category', 'Item Code', 'Item Name', 'Unit', 'Current Stock'];
-            } else {
-                $columns = ['#', 'Item Code', 'Item Name', 'Unit', 'Current Stock'];
-            }
-
-            $callback = function () use ($query, $columns, $reportType) {
-                $file = fopen('php://output', 'w');
-                fprintf($file, chr(0xef) . chr(0xbb) . chr(0xbf)); // Sinhala support
-                fputcsv($file, $columns);
-
-                $serial = 1;
-
-                if ($reportType == 'G_V_I_S_Report') {
-                    // Group කරපු data Excel එකට දාන විදිහ
-                    $groupedData = $query->get()->groupBy('itm_group');
-                    foreach ($groupedData as $groupName => $items) {
-                        foreach ($items as $item) {
-                            fputcsv($file, [$serial++, $groupName ?: 'Not Assigned', $item->itm_code, $item->itm_name, $item->itm_unit_of_measure, $item->itm_stock]);
-                        }
-                    }
-                } elseif ($reportType == 'I_B_S_Report') {
-                    // Group කරපු data Excel එකට දාන විදිහ
-                    $groupedData = $query->get()->groupBy('itm_group');
-                    foreach ($groupedData as $groupName => $items) {
-                        foreach ($items as $item) {
-                            fputcsv($file, [$serial++, $groupName ?: 'Not Assigned', $item->itm_code, $item->itm_name, $item->itm_unit_of_measure, $item->itm_stock]);
-                        }
-                    }
-                } else {
-                    // Normal list එක Excel එකට දාන විදිහ
-                    $items = $query->get();
+                // --- Group Wise Excel ---
+                $groupedData = $query->get()->groupBy('itm_group');
+                foreach ($groupedData as $groupName => $items) {
                     foreach ($items as $item) {
-                        fputcsv($file, [$serial++, $item->itm_code, $item->itm_name, $item->itm_unit_of_measure, $item->itm_stock]);
+                        fputcsv($file, [
+                            $serial++,
+                            $groupName ?: 'Not Assigned',
+                            $item->itm_code,
+                            $item->itm_name . ($item->itm_sinhalaname ? ' - ' . $item->itm_sinhalaname : ''),
+                            $item->itm_unit_of_measure,
+                            $item->itm_stock
+                        ]);
                     }
                 }
-                fclose($file);
-            };
-            return response()->stream($callback, 200, $headers);
-        }
-
-        // --- 2. Word Export ---
-        if ($exportType == 'word') {
-            $date = date('Y-m-d H:i A');
-            if ($reportType == 'G_V_I_S_Report') {
-                $groupedItems = $query->get()->groupBy('itm_group');
-                return response()->view('reports.item.word.totalitemsgrpviseword', compact('groupedItems', 'date'))->header('Content-Type', 'application/msword')->header('Content-Disposition', 'attachment; filename=group_items_report.doc');
+            } elseif ($reportType == 'I_B_S_Report') {
+                // --- Buffer Stock Excel ---
+                $items = $query->get();
+                foreach ($items as $item) {
+                    fputcsv($file, [
+                        $serial++,
+                        $item->itm_code,
+                        $item->itm_name . ($item->itm_sinhalaname ? ' - ' . $item->itm_sinhalaname : ''),
+                        $item->itm_unit_of_measure,
+                        $item->itm_stock,
+                        $item->itm_reorder_level,
+                        $item->itm_status == 'ordered' ? 'Ordered' : 'Not ordered'
+                    ]);
+                }
+            } else {
+                // --- Default Stock Excel ---
+                $items = $query->get();
+                foreach ($items as $item) {
+                    fputcsv($file, [
+                        $serial++,
+                        $item->itm_code,
+                        $item->itm_name . ($item->itm_sinhalaname ? ' - ' . $item->itm_sinhalaname : ''),
+                        $item->itm_unit_of_measure,
+                        $item->itm_stock
+                    ]);
+                }
             }
-
-            $items = $query->get();
-            return response()->view('reports.item.word.totalitemsword', compact('items', 'date'))->header('Content-Type', 'application/msword')->header('Content-Disposition', 'attachment; filename=all_items_report.doc');
-        }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
     }
+
+    // --- 2. Word Export ---
+    if ($exportType == 'word') {
+        $date = date('Y-m-d H:i A');
+
+        if ($reportType == 'G_V_I_S_Report') {
+            $groupedItems = $query->get()->groupBy('itm_group');
+            return response()->view('reports.item.word.totalitemsgrpviseword', compact('groupedItems', 'date'))
+                ->header('Content-Type', 'application/msword')
+                ->header('Content-Disposition', 'attachment; filename=group_items_report.doc');
+        }
+
+        if ($reportType == 'I_B_S_Report') {
+            $items = $query->get();
+            return response()->view('reports.item.word.itembufferstockword', compact('items', 'date'))
+                ->header('Content-Type', 'application/msword')
+                ->header('Content-Disposition', 'attachment; filename=item_buffer_stock_report.doc');
+        }
+
+        // Default Word Report
+        $items = $query->get();
+        return response()->view('reports.item.word.totalitemsword', compact('items', 'date'))
+            ->header('Content-Type', 'application/msword')
+            ->header('Content-Disposition', 'attachment; filename=items_report.doc');
+    }
+}
 
     private function runAutoForecasting()
     {

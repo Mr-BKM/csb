@@ -705,6 +705,14 @@
                                   <span class="nav-text"> Item Report View </span>
                               </a>
                           </li>
+                          <li class="nav-item">
+                              <a class="nav-link" href="/loanreport">
+                                  <span class="nav-icon">
+                                      <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
+                                  </span>
+                                  <span class="nav-text"> Loan Report View </span>
+                              </a>
+                          </li>
                       @endif
 
                   </ul>

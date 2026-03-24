@@ -13,6 +13,7 @@ use App\Http\Controllers\CancelorderController;
 use App\Http\Controllers\ItemreceivedController;
 use App\Http\Controllers\ItemreceivededitController;
 use App\Http\Controllers\ItemReportController;
+use App\Http\Controllers\LoanReportController;
 use App\Http\Controllers\ModifyorderController;
 use App\Http\Controllers\OrderaController;
 use App\Http\Controllers\OrdermController;
@@ -168,6 +169,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 Route::get('/items-export', [ItemReportController::class, 'export'])->name('itemsreport.export');
 
 Route::get('/itemsreport', [ItemReportController::class, 'showData'])->name('itemsreport.showData');
+
+Route::get('/loanreport', [LoanReportController::class, 'showData'])->name('loanreport.showData');
 
 
 });

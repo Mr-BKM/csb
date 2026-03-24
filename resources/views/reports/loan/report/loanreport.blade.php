@@ -1,10 +1,10 @@
-@extends('layouts.orderprint')
+@extends('layouts.loanreport')
 
 @section('content')
     <style>
         /* ============================================================
-                                Print Styles (A4 Portrait Layout)
-                            ============================================================ */
+                                                    Print Styles (A4 Portrait Layout)
+                                                ============================================================ */
         @media print {
             @page {
                 size: A4 portrait;
@@ -66,8 +66,8 @@
 
 
         /* ============================================================
-                                Screen View Styles
-                            ============================================================ */
+                                                    Screen View Styles
+                                                ============================================================ */
 
         /* Sticky Container Fix */
         @media screen {
@@ -195,7 +195,7 @@
                     <div class="d-flex align-items-center justify-content-between">
 
                         <div class="d-flex align-items-center gap-2 flex-grow-1">
-                            <form action="{{ route('itemsreport.showData') }}" method="GET" id="reportForm"
+                            <form action="{{ route('loanreport.showData') }}" method="GET" id="reportForm"
                                 class="d-flex align-items-center gap-2 w-100">
 
                                 <div style="flex: 1;">
@@ -287,39 +287,37 @@
                                 <tbody>
                                     @php $serialNumber = 1; @endphp
 
-                                    @foreach ($groupedItems as $groupName => $items)
-                                        <tr style="background-color: #f1f3f5;">
-                                            <td colspan="8" style="padding: 10px; border: 1px solid black;">
-                                                <h6 class="mb-0" style="font-weight: bold; color: #495057;">
-                                                    <iconify-icon icon="solar:folder-with-files-bold-duotone"
-                                                        class="me-2"></iconify-icon>
-                                                    Group Name: {{ $groupName ?: 'Other Items' }}
-                                                </h6>
-                                            </td>
+                                    @if ($groupedItems->isEmpty())
+                                        <tr>
+                                            <td colspan="5" class="text-center">No Data Found</td>
                                         </tr>
-
-                                        @foreach ($items as $item)
-                                            <tr>
-                                                <td style="text-align: center; font-weight: bold;">{{ $serialNumber++ }}
-                                                </td>
-
-                                                <td style="text-align: center;">{{ $item->itm_code }}</td>
-                                                <td>
-                                                    <strong>{{ $item->itm_name }}</strong>
-                                                    @if ($item->itm_sinhalaname)
-                                                        - <strong>{{ $item->itm_sinhalaname }}</strong>
-                                                    @endif
-                                                </td>
-                                                <td style="text-align: center;">{{ $item->itm_unit_of_measure }}</td>
-                                                <td style="text-align: center;">
-                                                    <span
-                                                        style="font-weight: bold; color: {{ $item->itm_reorder_flag == 'Yes' ? ($item->itm_stock <= $item->itm_reorder_level ? 'red' : 'green') : 'black' }};">
-                                                        {{ $item->itm_stock }}
-                                                    </span>
+                                    @else
+                                        @foreach ($groupedItems as $groupName => $items)
+                                            <tr style="background-color: #f1f3f5;">
+                                                <td colspan="5" style="padding: 10px; border: 1px solid black;">
+                                                    <h6 class="mb-0" style="font-weight: bold; color: #495057;">
+                                                        Group: {{ $groupName ?: 'Default' }}
+                                                    </h6>
                                                 </td>
                                             </tr>
+
+                                            @foreach ($items as $item)
+                                                <tr>
+                                                    <td style="text-align: center;">{{ $serialNumber++ }}</td>
+                                                    <td style="text-align: center;">{{ $item->itm_code }}</td>
+                                                    <td>
+                                                        <strong>{{ $item->cus_name }}</strong>
+                                                    </td>
+                                                    <td style="text-align: center;">Units</td>
+                                                    <td style="text-align: center;">
+                                                        <span style="font-weight: bold;">
+                                                            {{ $item->itm_qty }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
-                                    @endforeach
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
