@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* ============================================================
-                                                    Print Styles (A4 Portrait Layout)
-                                                ============================================================ */
+                                                                                                                                    Print Styles (A4 Portrait Layout)
+                                                                                                                                ============================================================ */
         @media print {
             @page {
                 size: A4 portrait;
@@ -66,8 +66,8 @@
 
 
         /* ============================================================
-                                                    Screen View Styles
-                                                ============================================================ */
+                                                                                                                                    Screen View Styles
+                                                                                                                                ============================================================ */
 
         /* Sticky Container Fix */
         @media screen {
@@ -221,14 +221,13 @@
                                         id="choices-group">
                                         <option value="">All Groups</option>
                                         @foreach ($groups as $group)
-                                            <option value="{{ $group->grp_name }}"
-                                                {{ request('group_id') == $group->grp_name ? 'selected' : '' }}>
-                                                {{ $group->grp_name }}
+                                            <option value="{{ $group->cus_id }}"
+                                                {{ request('group_id') == $group->cus_id ? 'selected' : '' }}>
+                                                {{ $group->cus_id }} - {{ $group->cus_name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-
                                 <button type="submit" class="btn btn-primary btn-sm px-4 d-flex align-items-center"
                                     style="height: 38px; white-space: nowrap;">
                                     <iconify-icon icon="fa6-solid:eye" class="me-1"></iconify-icon> View
@@ -292,12 +291,12 @@
                                             <td colspan="5" class="text-center">No Data Found</td>
                                         </tr>
                                     @else
-                                        @foreach ($groupedItems as $groupName => $items)
+                                        @foreach ($groupedItems as $cusId => $items)
                                             <tr style="background-color: #f1f3f5;">
                                                 <td colspan="5" style="padding: 10px; border: 1px solid black;">
-                                                    <h6 class="mb-0" style="font-weight: bold; color: #495057;">
-                                                        Group: {{ $groupName ?: 'Default' }}
-                                                    </h6>
+                                                    <h5 class="mb-0" style="font-weight: bold; color: #495057;">
+                                                        Customer: {{ $items->first()->cus_name }}
+                                                    </h5>
                                                 </td>
                                             </tr>
 
@@ -306,9 +305,10 @@
                                                     <td style="text-align: center;">{{ $serialNumber++ }}</td>
                                                     <td style="text-align: center;">{{ $item->itm_code }}</td>
                                                     <td>
-                                                        <strong>{{ $item->cus_name }}</strong>
+                                                        <strong>{{ $item->item->itm_name }}</strong>
                                                     </td>
-                                                    <td style="text-align: center;">Units</td>
+                                                    <td style="text-align: center;">{{ $item->item->itm_unit_of_measure }}
+                                                    </td>
                                                     <td style="text-align: center;">
                                                         <span style="font-weight: bold;">
                                                             {{ $item->itm_qty }}
