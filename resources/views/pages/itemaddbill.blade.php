@@ -140,7 +140,7 @@
                         "{{ $orderreceived->order_id }}",
                         "{{ $orderreceived->itm_code }}",
                         gridjs.html(`{!! $orderreceived->item->itm_name ?? '-' !!}`),
-                        "{{ $orderreceived->itm_qty }}",
+                        "{{ $orderreceived->itm_res_qty }}",
                         "{{ $orderreceived->itm_inv_numer }}",
                         gridjs.html(
                             `<button class="btn btn-sm btn-success add-btn" data-id="{{ $orderreceived->id }}" data-item-name="{{ $orderreceived->item->itm_name ?? 'Item' }}">Add</button>`
