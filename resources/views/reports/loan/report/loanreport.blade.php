@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* ============================================================
-                                                                                                                                                Print Styles (A4 Portrait Layout)
-                                                                                                                                            ============================================================ */
+                                                                                                                                                                Print Styles (A4 Portrait Layout)
+                                                                                                                                                            ============================================================ */
         @media print {
             @page {
                 size: A4 portrait;
@@ -66,8 +66,8 @@
 
 
         /* ============================================================
-                                                                                                                                                Screen View Styles
-                                                                                                                                            ============================================================ */
+                                                                                                                                                                Screen View Styles
+                                                                                                                                                            ============================================================ */
 
         /* Sticky Container Fix */
         @media screen {
@@ -267,6 +267,9 @@
                                 Generated on: {{ date('Y-m-d H:i A') }}
                             </small>
                         </div>
+                        <span style="font-size: 18px; margin-left: 10px; color: #555;">
+                            (Total Items: {{ $groupedItems->flatten()->count() }})
+                        </span>
                     </div>
                 </div>
 
@@ -284,14 +287,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $serialNumber = 1; @endphp
-
                                     @if ($groupedItems->isEmpty())
                                         <tr>
                                             <td colspan="5" class="text-center">No Data Found</td>
                                         </tr>
                                     @else
                                         @foreach ($groupedItems as $cusId => $items)
+                                            {{-- Hama group ekakatama serial number eka meheadi reset karanawa --}}
+                                            @php $serialNumber = 1; @endphp
+
                                             <tr style="background-color: #f1f3f5;">
                                                 <td colspan="5" style="padding: 10px; border: 1px solid black;">
                                                     <h5 class="mb-0" style="font-weight: bold; color: #495057;">
