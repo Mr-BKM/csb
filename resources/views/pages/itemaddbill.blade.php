@@ -67,8 +67,8 @@
                                         <!-- Bill Date -->
                                         <div class="input-group" style="width: 250px;">
                                             <div class="form-floating flex-grow-1">
-                                                <input type="date" id="date-picker" name="bill_submit_date" class="form-control"
-                                                    placeholder="Select Date" required>
+                                                <input type="date" id="date-picker" name="bill_submit_date"
+                                                    class="form-control" placeholder="Select Date" required>
                                                 <label for="date-picker">Date</label>
                                             </div>
                                         </div>
@@ -76,8 +76,8 @@
                                         <!-- Bill Number -->
                                         <div class="input-group" style="width: 400px;">
                                             <div class="form-floating flex-grow-1">
-                                                <input type="text" class="form-control" name="bill_number" id="bill_number"
-                                                    placeholder="Enter Bill Number" required>
+                                                <input type="text" class="form-control" name="bill_number"
+                                                    id="bill_number" placeholder="Enter Bill Number" required>
                                                 <label for="bill_number">Bill Number</label>
                                             </div>
                                         </div>
@@ -96,42 +96,42 @@
         document.addEventListener("DOMContentLoaded", () => {
             let addedItems = [];
 
-            document.addEventListener("click", function (e) {
-        if (e.target.classList.contains("add-btn")) {
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("add-btn")) {
 
-            const btn = e.target;
-            const id = btn.dataset.id;
-            const itemName = btn.dataset.itemName;
+                    const btn = e.target;
+                    const id = btn.dataset.id;
+                    const itemName = btn.dataset.itemName;
 
-            if (!addedItems.includes(id)) {
-                addedItems.push(id);
-                btn.classList.replace("btn-success", "btn-secondary");
-                btn.textContent = "Added";
-                showToast(`"${itemName}" added successfully!`, 'success');
-            } else {
-                addedItems = addedItems.filter(item => item !== id);
-                btn.classList.replace("btn-secondary", "btn-success");
-                btn.textContent = "Add";
-                showToast(`"${itemName}" removed!`, 'warning');
+                    if (!addedItems.includes(id)) {
+                        addedItems.push(id);
+                        btn.classList.replace("btn-success", "btn-secondary");
+                        btn.textContent = "Added";
+                        showToast(`"${itemName}" added successfully!`, 'success');
+                    } else {
+                        addedItems = addedItems.filter(item => item !== id);
+                        btn.classList.replace("btn-secondary", "btn-success");
+                        btn.textContent = "Add";
+                        showToast(`"${itemName}" removed!`, 'warning');
+                    }
+                }
+            });
+
+            function refreshAddedButtons() {
+                document.querySelectorAll(".add-btn").forEach(btn => {
+                    const id = btn.dataset.id;
+
+                    if (addedItems.includes(id)) {
+                        btn.classList.remove("btn-success");
+                        btn.classList.add("btn-secondary");
+                        btn.textContent = "Added";
+                    } else {
+                        btn.classList.remove("btn-secondary");
+                        btn.classList.add("btn-success");
+                        btn.textContent = "Add";
+                    }
+                });
             }
-        }
-    });
-
-    function refreshAddedButtons() {
-        document.querySelectorAll(".add-btn").forEach(btn => {
-            const id = btn.dataset.id;
-
-            if (addedItems.includes(id)) {
-                btn.classList.remove("btn-success");
-                btn.classList.add("btn-secondary");
-                btn.textContent = "Added";
-            } else {
-                btn.classList.remove("btn-secondary");
-                btn.classList.add("btn-success");
-                btn.textContent = "Add";
-            }
-        });
-    }
 
             const data = [
                 @foreach ($orderreceiveds as $index => $orderreceived)
@@ -140,11 +140,11 @@
                         "{{ $orderreceived->order_id }}",
                         "{{ $orderreceived->itm_code }}",
                         gridjs.html(`{!! $orderreceived->item->itm_name ?? '-' !!}`),
-                        "{{ $orderreceived->itm_qty }}",
+                        "{{ $orderreceived->itm_res_qty }}",
                         "{{ $orderreceived->itm_inv_numer }}",
                         gridjs.html(
                             `<button class="btn btn-sm btn-success add-btn" data-id="{{ $orderreceived->id }}" data-item-name="{{ $orderreceived->item->itm_name ?? 'Item' }}">Add</button>`
-                            )
+                        )
                     ]
                     @if (!$loop->last)
                         ,
@@ -193,20 +193,22 @@
 
             const tableContainer = document.getElementById("table-gridjs");
 
-let isUpdating = false;
+            let isUpdating = false;
 
-const observer = new MutationObserver(() => {
-    if (isUpdating) return;
+            const observer = new MutationObserver(() => {
+                if (isUpdating) return;
 
-    isUpdating = true;             // stop infinite loop
-    refreshAddedButtons();         // update buttons safely
-    setTimeout(() => { isUpdating = false; }, 30);
-});
+                isUpdating = true; // stop infinite loop
+                refreshAddedButtons(); // update buttons safely
+                setTimeout(() => {
+                    isUpdating = false;
+                }, 30);
+            });
 
-observer.observe(tableContainer, {
-    childList: true,
-    subtree: true
-});
+            observer.observe(tableContainer, {
+                childList: true,
+                subtree: true
+            });
 
             // Toast function
             function showToast(message, type = 'primary') {
