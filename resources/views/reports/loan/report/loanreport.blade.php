@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* ============================================================
-                                                                                                                                    Print Styles (A4 Portrait Layout)
-                                                                                                                                ============================================================ */
+                                                                                                                                                Print Styles (A4 Portrait Layout)
+                                                                                                                                            ============================================================ */
         @media print {
             @page {
                 size: A4 portrait;
@@ -66,8 +66,8 @@
 
 
         /* ============================================================
-                                                                                                                                    Screen View Styles
-                                                                                                                                ============================================================ */
+                                                                                                                                                Screen View Styles
+                                                                                                                                            ============================================================ */
 
         /* Sticky Container Fix */
         @media screen {
@@ -198,7 +198,7 @@
                             <form action="{{ route('loanreport.showData') }}" method="GET" id="reportForm"
                                 class="d-flex align-items-center gap-2 w-100">
 
-                                <div style="flex: 1;">
+                                {{-- <div style="flex: 1;">
                                     <select class="form-control form-select-sm" data-choices name="report_type"
                                         id="choices-report-type">
                                         <option value="C_I_S_Report"
@@ -214,7 +214,7 @@
                                             3. Item Buffer Stock Report
                                         </option>
                                     </select>
-                                </div>
+                                </div> --}}
 
                                 <div style="flex: 1;">
                                     <select class="form-control form-select-sm" data-choices name="group_id"
@@ -260,7 +260,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12 text-center">
-                        <h3 class="mb-0"><strong><u>Group Vise Item Stock Report</u></strong></h3>
+                        <h3 class="mb-0"><strong><u>Customer Vise Item Loan Report</u></strong></h3>
                         <div style="line-height: 1.2; margin-top: 5px;">
                             <p class="mb-0" style="font-size: 14px;">පාරිභෝජ්‍ය ගබඩාව - B | ශික්ෂණ රෝහල, අනුරාධපුර</p>
                             <small class="text-muted" style="font-size: 12px; font-weight: bold;">
