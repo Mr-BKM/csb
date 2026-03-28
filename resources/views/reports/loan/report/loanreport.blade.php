@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* ============================================================
-                                                                                                                                                                Print Styles (A4 Portrait Layout)
-                                                                                                                                                            ============================================================ */
+                                                                                                                                                                                                                        Print Styles (A4 Portrait Layout)
+                                                                                                                                                                                                                    ============================================================ */
         @media print {
             @page {
                 size: A4 portrait;
@@ -66,8 +66,8 @@
 
 
         /* ============================================================
-                                                                                                                                                                Screen View Styles
-                                                                                                                                                            ============================================================ */
+                                                                                                                                                                                                                        Screen View Styles
+                                                                                                                                                                                                                    ============================================================ */
 
         /* Sticky Container Fix */
         @media screen {
@@ -216,7 +216,7 @@
                                     </select>
                                 </div> --}}
 
-                                <div style="flex: 1;">
+                                <div style="width: 500px;">
                                     <select class="form-control form-select-sm" data-choices name="group_id"
                                         id="choices-group">
                                         <option value="">All Groups</option>
@@ -236,7 +236,7 @@
                         </div>
 
                         <div class="ms-3 d-flex gap-1">
-                            <a href="{{ url('/items-export?type=word&report_type=' . request('report_type') . '&group_id=' . request('group_id')) }}"
+                            {{-- <a href="{{ url('/items-export?type=word&report_type=' . request('report_type') . '&group_id=' . request('group_id')) }}"
                                 class="btn-custom btn-word" title="Word">
                                 <iconify-icon icon="fa6-solid:file-word"></iconify-icon>
                             </a>
@@ -244,7 +244,7 @@
                             <a href="{{ url('/items-export?type=excel&report_type=' . request('report_type') . '&group_id=' . request('group_id')) }}"
                                 class="btn-custom btn-excel" title="Excel">
                                 <iconify-icon icon="fa6-solid:file-excel"></iconify-icon>
-                            </a>
+                            </a> --}}
 
                             <a href="javascript:window.print()" class="btn-custom btn-print" title="Print">
                                 <iconify-icon icon="fa6-solid:print"></iconify-icon>
@@ -299,7 +299,7 @@
                                             <tr style="background-color: #f1f3f5;">
                                                 <td colspan="5" style="padding: 10px; border: 1px solid black;">
                                                     <h5 class="mb-0" style="font-weight: bold; color: #495057;">
-                                                        Customer: {{ $items->first()->cus_name }}
+                                                        {{ $items->first()->cus_name }}
                                                     </h5>
                                                 </td>
                                             </tr>
