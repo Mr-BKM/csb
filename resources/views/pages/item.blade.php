@@ -519,9 +519,9 @@
                                                                                                             {{ $item->itm_unit_of_measure == 'Coil' ? 'selected' : '' }}>
                                                                                                             Coil</option>
                                                                                                         <option
-                                                                                                            value="Books"
-                                                                                                            {{ $item->itm_unit_of_measure == 'Books' ? 'selected' : '' }}>
-                                                                                                            Books</option>
+                                                                                                            value="Cubes"
+                                                                                                            {{ $item->itm_unit_of_measure == 'Cubes' ? 'selected' : '' }}>
+                                                                                                            Cubes</option>
                                                                                                     </select>
                                                                                                 </div>
                                                                                                 <div class="mb-3">
@@ -755,7 +755,7 @@
                                                                         <option value="Roll">Roll (Wire/Mesh)</option>
                                                                         <option value="Bundle">Bundle (Pipes/Rods)</option>
                                                                         <option value="Coil">Coil (Poly Pipe)</option>
-                                                                        <option value="Books">Books</option>
+                                                                        <option value="Cubes">Cubes</option>
                                                                     </select>
                                                                 </div>
 
