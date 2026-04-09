@@ -43,11 +43,22 @@ class ConfirmOrderController extends Controller
             'po_state' => 'Added',
         ]);
 
-        // Retrieve the specific item codes (itm_code) associated with the confirmed orders
-        $itemCodes = Orderm::whereIn('id', $data['ids'])->pluck('itm_code');
+        // Step 3 & 4 Shortcut (Advanced)
+$itemCodes = Orderm::whereIn('id', $data['ids'])->distinct()->pluck('itm_code');
 
-        // Update the status of these items to 'active' in the Items table
-        Item::whereIn('itm_code', $itemCodes)->update(['itm_status' => 'active']);
+// "Added" nowuna orders thiyena item codes list ekak gannawa
+$codesWithPending = Orderm::whereIn('itm_code', $itemCodes)
+    ->where('po_state', 'Pending')
+    ->distinct()
+    ->pluck('itm_code')
+    ->toArray();
+
+// $itemCodes walin $codesWithPending tika ain kalama ithiri wenne update karanna ona tika
+$codesToUpdate = $itemCodes->diff($codesWithPending);
+
+if ($codesToUpdate->isNotEmpty()) {
+    Item::whereIn('itm_code', $codesToUpdate)->update(['itm_status' => 'active']);
+}
 
         // Redirect back to the order list with a success message
         return redirect()->route('confirmorder.showData')->with('success', 'Selected Order items "Confirmed" successfully!');
