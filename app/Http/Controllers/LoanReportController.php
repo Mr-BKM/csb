@@ -38,7 +38,7 @@ class LoanReportController extends Controller
             $groupedRow->itm_qty = $itemGroup->sum('itm_qty');
 
             return $groupedRow;
-        });
+        })->sortBy('itm_code');
     });
 
     return view('reports.loan.report.loanreport', compact('groupedItems', 'groups'));
