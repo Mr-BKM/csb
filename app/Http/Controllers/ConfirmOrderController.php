@@ -44,21 +44,17 @@ class ConfirmOrderController extends Controller
         ]);
 
         // Step 3 & 4 Shortcut (Advanced)
-$itemCodes = Orderm::whereIn('id', $data['ids'])->distinct()->pluck('itm_code');
+        $itemCodes = Orderm::whereIn('id', $data['ids'])->distinct()->pluck('itm_code');
 
-// "Added" nowuna orders thiyena item codes list ekak gannawa
-$codesWithPending = Orderm::whereIn('itm_code', $itemCodes)
-    ->where('po_state', 'Pending')
-    ->distinct()
-    ->pluck('itm_code')
-    ->toArray();
+        // "Added" nowuna orders thiyena item codes list ekak gannawa
+        $codesWithPending = Orderm::whereIn('itm_code', $itemCodes)->where('po_state', 'Pending')->distinct()->pluck('itm_code')->toArray();
 
-// $itemCodes walin $codesWithPending tika ain kalama ithiri wenne update karanna ona tika
-$codesToUpdate = $itemCodes->diff($codesWithPending);
+        // $itemCodes walin $codesWithPending tika ain kalama ithiri wenne update karanna ona tika
+        $codesToUpdate = $itemCodes->diff($codesWithPending);
 
-if ($codesToUpdate->isNotEmpty()) {
-    Item::whereIn('itm_code', $codesToUpdate)->update(['itm_status' => 'active']);
-}
+        if ($codesToUpdate->isNotEmpty()) {
+            Item::whereIn('itm_code', $codesToUpdate)->update(['itm_status' => 'active']);
+        }
 
         // Redirect back to the order list with a success message
         return redirect()->route('confirmorder.showData')->with('success', 'Selected Order items "Confirmed" successfully!');
