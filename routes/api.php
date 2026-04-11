@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CustomerController;
-use App\Http\Controllers\Api\IssuingController;
+use App\Http\Controllers\API\IssuingController;
 use App\Http\Controllers\API\ItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
