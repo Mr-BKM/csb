@@ -272,6 +272,7 @@
                                     <tr>
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Code</th>
+                                        <th style="text-align: center;">Page No</th>
                                         <th>Item Name</th>
                                         <th style="text-align: center;">Unit</th>
                                         <th style="text-align: center;">Stock</th>
@@ -282,6 +283,7 @@
                                         <tr>
                                             <td style="text-align: center;">{{ $index + 1 }}</td>
                                             <td style="text-align: center;">{{ $item->itm_code }}</td>
+                                            <td style="text-align: center;">{{ $item->itm_page_num }}</td>
                                             <td>
                                                 <strong>{{ $item->itm_name }}</strong>
                                                 @if ($item->itm_sinhalaname)

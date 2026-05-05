@@ -270,6 +270,7 @@
                                     <tr>
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">Code</th>
+                                        <th style="text-align: center;">Page No</th>
                                         <th>Item Name</th>
                                         <!-- <th>Item Name Sinhala</th> -->
                                         <!-- <th>Group</th> -->
@@ -299,6 +300,7 @@
                                                 </td>
 
                                                 <td style="text-align: center;">{{ $item->itm_code }}</td>
+                                                <td style="text-align: center;">{{ $item->itm_page_num }}</td>
                                                 <td>
                                                     <strong>{{ $item->itm_name }}</strong>
                                                 </td>
